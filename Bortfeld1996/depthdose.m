@@ -1,3 +1,6 @@
+% Last edited: 16th Jan
+% From Bortfeld/Schlegel, 1996
+
 function D_BP_d=depthdose(alpha,E0,p,d,rho)
     steps=length(d);
     D_BP_d=zeros(1,steps);

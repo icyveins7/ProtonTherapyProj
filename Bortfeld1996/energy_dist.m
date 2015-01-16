@@ -1,3 +1,6 @@
+% Last edited: 16th Jan
+% From Bortfeld/Schlegel, 1996
+
 function E_d=energy_dist(alpha,E0,p,d) 
     steps=length(d);
     E_d=zeros(1,steps);

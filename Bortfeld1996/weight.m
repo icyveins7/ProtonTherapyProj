@@ -1,3 +1,6 @@
+% Last edited: 16th Jan
+% From Bortfeld/Schlegel, 1996
+
 function W_R=weight(alpha,p,R,D0,rho,d_a,d_b)
     steps=length(R);
     W_R=zeros(1,steps);
