@@ -1,3 +1,5 @@
+% Last edited: 16th Jan
+
 function W_disc_R=weight_disc(alpha,p,D0,rho,d_a,d_b,itv)
     steps=floor(((d_b-d_a)/itv))+1;
     R=d_a:itv:d_b;
