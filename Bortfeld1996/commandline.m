@@ -1,3 +1,5 @@
+% Based on Bortfeld 1996: An analytical approximation of depth-dose distributions
+% for therapeutic proton beams
 % Last edited: 16th Jan
 % Command line file to adjust parameters, plot graphs from functions
 
