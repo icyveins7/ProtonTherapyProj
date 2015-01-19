@@ -41,13 +41,13 @@ plot(d,testmz2);
 
 
  
-% D_z=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho);
-% D_h20=doseh20(phi0,sigma,alpha,epsilon,E0,p,d);
+D_z=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho);
+D_h20=doseh20(phi0,sigma,alpha,epsilon,E0,p,d);
 
-% figure(1);
-% plot(d,D_z);
-% ylabel('Dose per fluence');
+figure(1);
+plot(d,D_z);
+ylabel('Dose per fluence');
 
-% 
-% figure(2);
-% plot(d,D_h20);
+
+figure(2);
+plot(d,D_h20);
