@@ -4,9 +4,6 @@
 % function
 
 function D_z=dose_C(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,toggle_approx)
-    if ~libisloaded('Bortfeld_1997dll')        
-        loadlibrary('Bortfeld_1997dll','Bortfeld_1997dll.h');
-    end
     steps=length(d);
     D_z=zeros(1,steps);
     R0=range(alpha,E0,p);
@@ -20,5 +17,4 @@ function D_z=dose_C(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,toggle_approx)
                 (gamma*beta+beta/p)*parafunc_C(-1/p-1,-z(i)));
         end
     end
-    unloadlibrary Bortfeld_1997dll;
 end
