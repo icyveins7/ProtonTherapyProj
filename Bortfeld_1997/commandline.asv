@@ -29,26 +29,19 @@ z=zetafunc(R0,d,sigma);
 % figure(2);
 % plot(d,testmz);
  
-% D_zapprox=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,1);
-% D_z=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,0);
-% Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho);
+D_zapprox=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,1);
+D_z=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,0);
+Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho);
 % D_h20=doseh20(phi0,sigma,alpha,epsilon,E0,p,d);
 % 
-% figure(3);
-% plot(d,D_z./fluence(phi0,beta,R0,d)); hold on;
-% ylabel('Dose per fluence');
-% plot(d,Dhat_z./fluence(phi0,beta,R0,d));
-% figleg=legend('D(z)','$\hat{D}$(z)'); set(figleg,'Interpreter','Latex');
-
-D=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,0); %non-C function
-D_C=dose_C(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,0); % uses C library
-
-
-figure(4);
-plot(d,D./fluence(phi0,beta,R0,d)); hold on;
+figure(3);
+plot(d,D_z./fluence(phi0,beta,R0,d)); hold on;
 ylabel('Dose per fluence');
-plot(d,D_C./fluence(phi0,beta,R0,d));
-figleg=legend('Matlab function','C Library'); set(figleg,'Interpreter','Latex');
+plot(d,Dhat_z./fluence(phi0,beta,R0,d));
+figleg=legend('D(z)','$\hat{D}$(z)'); set(figleg,'Interpreter','Latex');
+
+D=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,0); %non - 
+D_C
 
 % 
 % figure(2);
