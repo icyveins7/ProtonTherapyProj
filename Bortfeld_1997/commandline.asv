@@ -13,9 +13,8 @@ rho=1; %mass density of medium
 R0=range(alpha,E0,p); %R in units of cm
 beta=0.012;
 sigma=0.012*(R0^0.935);
-gamma=0.6; %fraction of energy released in the nonelastic nuclear 
-%interactions that is absorbed locally
-phi0=1000; %primary particle fluence
+gamma=0.6;
+phi0=1000;
 epsilon=0.2; %fraction of peak fluence in tail fluence
 
 % testing functions

@@ -2,7 +2,7 @@
 % Parabolic Cylinder Function
 % 19th Jan
 % obtained from Table of Integrals, Series and Products by Gradshteyn,
-% Ryzhik, 9.240, 2nd line
+% Ryzhik, Page 1028, Equation 9.240, 2nd line
 
 function [D_nu,terms]=parafunc(nu,z)
     D_nu=zeros(1,length(z));
