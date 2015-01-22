@@ -12,7 +12,12 @@
  *
  *		out = F11(a, b, z, precision)
  *
- * This is a MEX-file for MATLAB, compiled with version 8.4.0.150421(R2014b).
+ * This is a MEX-file for MATLAB, compiled with version 8.4.0.150421(R2014b),
+ * using Microsoft Visual Studio 2013.
+ *
+ * If unable to load, download Visual C++ Redistributable Packages for Visual Studio 2013
+ * http://www.microsoft.com/en-us/download/details.aspx?id=40784
+ *
 */
 void F11(double a, double b, double z, int precision, double *out){
 	//current term
