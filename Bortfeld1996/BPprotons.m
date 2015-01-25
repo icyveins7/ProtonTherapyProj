@@ -106,7 +106,10 @@ L_E_T=straggling(x,LET); % MeV/mm
 figure(2); plot(x,L_E_T); xlabel('Depth, x (mm)'); ylabel('LET (MeV/mm)'); hold on;
 if (inc_analytic~=0)
     disp('Calling Bortfeld_1997 analytic function...');
-    addpath I:/Work/ProtonTherapyProj/Bortfeld_1997
+    currfolder=pwd;
+    currfolder=currfolder(1:end-12);
+    bortfolder=strcat(currfolder,'Bortfeld_1997');
+    addpath(bortfolder);
     % we use default values for water, imported from Bortfeld commandline code
     % here x is in mm but Bortfeld code is in cm
     alpha=2.2e-3;
@@ -125,7 +128,7 @@ if (inc_analytic~=0)
     L_E_Tbf=L_E_Tbf.*rho*1e-3; %MeV mm^-1
     % plot
     plot(x,L_E_Tbf); legend('Candela code','Bortfeld code');
-    rmpath I:/Work/ProtonTherapyProj/Bortfeld_1997
+    rmpath(bortfolder);
 end
 % end of additions
 
