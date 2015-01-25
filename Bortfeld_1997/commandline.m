@@ -9,7 +9,7 @@ close all; clear all; clc; clear mem;
 E0=150; %E0 in units of MeV
 alpha=2.2e-3;
 p=1.77;
-rho=1; %mass density of medium
+rho=1; %mass density of medium, g/cm^3
 R0=range(alpha,E0,p); %R in units of cm
 beta=0.012;
 sigma=0.012*(R0^0.935);
@@ -32,25 +32,25 @@ z=zetafunc(R0,d,sigma);
  
 % D_zapprox=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,1);
 % D_z=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,0);
-% Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho);
+Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho);
 % D_h20=doseh20(phi0,sigma,alpha,epsilon,E0,p,d);
 % 
-% figure(3);
+figure(3);
 % plot(d,D_z./fluence(phi0,beta,R0,d)); hold on;
 % ylabel('Dose per fluence');
-% plot(d,Dhat_z./fluence(phi0,beta,R0,d));
+plot(d,Dhat_z./fluence(phi0,beta,R0,d));
 % figleg=legend('D(z)','$\hat{D}$(z)'); set(figleg,'Interpreter','Latex');
 
-D=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,epsilon,0); %non-C function
-D_C=dose_C(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,epsilon,0); % uses C library
+% D=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,epsilon,0); %non-C function
+D_C=dose_C(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,epsilon,1); % uses C library
 
 
 figure(4);
-plot(d,D./fluence(phi0,beta,R0,d)); hold on;
+% plot(d,D./fluence(phi0,beta,R0,d)); hold on;
+plot(d,D_C./fluence(phi0,beta,R0,d)); hold on;
 ylabel('Dose per fluence');
-plot(d,D_C./fluence(phi0,beta,R0,d));
-figleg=legend('Matlab function','C Library'); set(figleg,'Interpreter','Latex');
-% 
+% figleg=legend('Matlab function','C Library'); set(figleg,'Interpreter','Latex');
+
 % 
 % figure(2);
 % plot(d,D_h20);
