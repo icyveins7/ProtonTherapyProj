@@ -2,7 +2,7 @@
 #include<math.h>
 
 /*
- * Bortfeld_1997dll.c
+ * F11.c
  *
  * 1F1 Hypergeometric Function (for real numbers)
  *

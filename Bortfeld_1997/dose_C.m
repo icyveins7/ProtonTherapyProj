@@ -24,7 +24,7 @@ function D_z=dose_C(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,epsilon,toggle_approx
             (gamma*beta+beta/p+epsilon/R0)*parafunc_C(-1/p-1,-z(i)));
         if (isnan(D_z(i)) || D_z(i)==inf)
             if toggle_approx==1
-                D_z(i)=dosehat(phi0,beta,alpha,gamma,E0,p,d(i),rho);
+                D_z(i)=dosehat(phi0,beta,alpha,gamma,E0,p,d(i),rho, epsilon);
             end
         end
     end

@@ -60,10 +60,10 @@ for k=2:dimT
     x(k)=trapz(Tp,y)+x(k-1); %Depth m
 end
 
-figure;
-loglog(T,Tcs, T,Tcshyd, T, S10, T, S01, T, shelltot);
-xlabel('incidental particle energy')
-ylabel('total cross section')
+% figure;
+% loglog(T,Tcs, T,Tcshyd, T, S10, T, S01, T, shelltot);
+% xlabel('incidental particle energy')
+% ylabel('total cross section')
 
 x=x*10^3; %mm   x in unit of meter is converted to x in units of cm.
 LET=LET*10^-9; % MeV/mm
@@ -128,6 +128,7 @@ if (inc_analytic~=0)
     L_E_Tbf=L_E_Tbf.*rho*1e-3; %MeV mm^-1
     % plot
     plot(x,L_E_Tbf); legend('Candela code','Bortfeld code');
+    title(strcat(num2str(Tn),' MeV'));
     rmpath(bortfolder);
 end
 % end of additions

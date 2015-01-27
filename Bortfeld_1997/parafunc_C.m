@@ -1,5 +1,5 @@
 % C library version of previous function, precision to 12 digits
-% (equivalent to format long in Matlab
+% (equivalent to format long in Matlab)
 % Parabolic Cylinder Function
 % Edited 21st Jan
 % obtained from Table of Integrals, Series and Products by Gradshteyn,

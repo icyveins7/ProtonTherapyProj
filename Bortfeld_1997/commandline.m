@@ -19,8 +19,8 @@ phi0=1000; %primary particle fluence
 epsilon=0.2; %fraction of peak fluence in tail fluence
 
 % testing functions
-R=0:0.1:R0*1.1;
-d=0:0.1:R0*1.1;
+R=0:0.02:R0*1.1;
+d=0:0.02:R0*1.1;
 % R=0:0.1:R0;
 % d=0:0.1:R0;
 z=zetafunc(R0,d,sigma);
@@ -30,25 +30,24 @@ z=zetafunc(R0,d,sigma);
 % figure(2);
 % plot(d,testmz);
  
-% D_zapprox=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,1);
-% D_z=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,0);
-Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho);
-% D_h20=doseh20(phi0,sigma,alpha,epsilon,E0,p,d);
+D_z=dose_C(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,epsilon,1);
+Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho,epsilon);
 % 
 figure(3);
-% plot(d,D_z./fluence(phi0,beta,R0,d)); hold on;
-% ylabel('Dose per fluence');
+plot(d,D_z./fluence(phi0,beta,R0,d)); hold on;
+ylabel('Dose per fluence');
 plot(d,Dhat_z./fluence(phi0,beta,R0,d));
-% figleg=legend('D(z)','$\hat{D}$(z)'); set(figleg,'Interpreter','Latex');
+figleg=legend('D(z)','$\hat{D}$(z)'); set(figleg,'Interpreter','Latex');
+figtitle=title(strcat('$\epsilon$ = ',num2str(epsilon))); set(figtitle,'Interpreter','Latex');
 
 % D=dose(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,epsilon,0); %non-C function
-D_C=dose_C(phi0,sigma,beta,alpha,gamma,E0,p,d,rho,epsilon,1); % uses C library
 
 
 figure(4);
 % plot(d,D./fluence(phi0,beta,R0,d)); hold on;
-plot(d,D_C./fluence(phi0,beta,R0,d)); hold on;
+plot(d,D_z./fluence(phi0,beta,R0,d)); hold on;
 ylabel('Dose per fluence');
+figtitle=title(strcat('$\epsilon$ = ',num2str(epsilon))); set(figtitle,'Interpreter','Latex');
 % figleg=legend('Matlab function','C Library'); set(figleg,'Interpreter','Latex');
 
 % 
