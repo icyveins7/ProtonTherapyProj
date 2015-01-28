@@ -12,8 +12,13 @@ close all; clear all; clc; clear mem;
 % plot(t,Te);
 
 % molecular subsystem
-t=0:0.001:0.1;
-initial_T=310;
-[T,t]=ode45(@moleculartempfunc, t, initial_T);
-figure(2);
-plot(t,T);
+% t=0:0.001:0.1;
+% initial_T=310;
+% [T,t]=ode45(@moleculartempfunc, t, initial_T);
+% figure(2);
+% plot(t,T);
+
+r=0:0.1:1000;
+e1=energydensity(r,0.075,150,1);
+figure(3)
+semilogx(r,e1);

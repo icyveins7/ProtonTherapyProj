@@ -4,9 +4,16 @@
 % at a distance r from the path of an ion
 % Last edited by Ping Lin/Gabriel, 27/01/15
 
-function D2_r = energydensity(r,w,v,Z)  % electron energy w in units of keV
+function D2_r = energydensity(r,w,E_ion,Z)  
+    % electron energy w in units of keV
+    % ion energy E_ion in units of MeV
+    switch nargin
+        case 2
+            Z=1; % charge of proton
+    end
     c1=1.352817016; % Ne^4/mc^2 in units of keV mm^-1
-    b=v/3e8; % v=velocity of ion/proton
+    lorentzfactor=(E_ion/938)+1;
+    b=(1-(1/lorentzfactor)^2)^0.5;
     if (w<1)
         alpha_w=1.079;
     else 
@@ -41,6 +48,4 @@ function D2_r = energydensity(r,w,v,Z)  % electron energy w in units of keV
         D2_r(i) = D1_r(i)*(1+K_r);
     end
 end
-        
-% problem: what is the energy of secondary electrons?
     
