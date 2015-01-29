@@ -8,7 +8,7 @@ function D2_r = energydensity(r,w,E_ion,Z)
     % electron energy w in units of keV
     % ion energy E_ion in units of MeV
     switch nargin
-        case 2
+        case 3
             Z=1; % charge of proton
     end
     c1=1.352817016; % Ne^4/mc^2 in units of keV mm^-1

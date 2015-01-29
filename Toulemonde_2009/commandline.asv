@@ -26,18 +26,16 @@ close all; clear all; clc; clear mem;
 [p,e,t] = initmesh('squareg'); 
 [p,e,t] = refinemesh('squareg',p,e,t); 
 u0 = zeros(2,1);  
-tlist = linspace(0,0.01,2); 
+tlist = linspace(0,0.1,20); 
 bc=0; % boundary conditions
-c=[2;0;2;6e-3;0;6e-3]; % [Ke,K] in units of W K^-1 cm^-1 
+c=
 g=1; % electron-phonon coupling
 a=zeros(2,2);
 d=zeros(2,2);
 d(1,1)=1; % Ce, in J K^-1 g^-1
 d(2,2)=4.18; % rho*C, in g cm^-3 J g^-1 K^-1
-for i=1:2
+for (i=1:2)
     a(i,i)=g;
 end
-r=0:0.1:1000;
-B=energydensity(r,0.075,150,1);
-f=[g*u(2)+B;g*u(1)];
-u1 = parabolic(u0,tlist,'bc',p,e,t,c,a,f,d);
+f=char()
+u1 = parabolic(u0,tlist,'squareb1',p,e,t,c,a,f,d);
