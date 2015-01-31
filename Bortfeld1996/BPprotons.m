@@ -1,22 +1,64 @@
-function [x,L_E_T]=BPprotons(Tn, namefile, inc_analytic)
-% Adding default arguments to old code; code should run as before with 2
-% arguments, but inc_analytic can be included to plot the Bortfeld_1997
-% approximations if set to 1.
-% Edited 25 Jan 2015 by Gabriel/Pinglin
-switch nargin
-    case 2
-        inc_analytic=0;
-end
-%we we want to run the program we write for example that Bpprotons(100,'aslanin.txt') 
+function [x,L_E_T]=BPprotons(Tn, namefile, varargin)
+% we want to run the program we write for example that Bpprotons(100,'aslanin.txt') 
 % and 100 means 100 MeV and aslanin.txt is the name of the file which
 % will be made and its output will be read by SOBP code later.
 % One feaure of our current code is that it also uses the matlab figure which
 % has experimental data and then it is plotted here for comparison
 % purposes.
-
+% 
 % Tn= Initial kinetic energy of the proton, MeV
 % L_E_T= Vector with the Linear Energy Transfer after considering straggling and fragmentation
 % x = Vector with depths
+% 
+% //Edited 31 Jan 2015 by Gabriel/Pinglin 
+% //(all edits by us below are commented as well, between // to mark them)
+% //Adding default arguments to old code; code should run as before with 2
+% //arguments, but other parameters can be included to plot the Bortfeld_1997
+% 
+% //Calling syntax is defined as 1 of the following
+% //(first one is the original):
+% 
+% // 1) BPprotons(Tn,namefile)
+% // 2) BPprotons(Tn,namefile,epsilon,E_sigma)
+%       ->    specify beam parameters
+% // 3) BPprotons(Tn,namefile,epsilon,E_sigma,alpha,p,rho,beta,gamma,phi0)
+%       -> all variable specified, should be unnecessary
+
+switch nargin
+    % case 2 is the original functionality
+    case 2
+        disp('Running original code...');
+    % case 4 is the imported Bortfeld comparison with default values,
+    % with specified energy beam parameters epsilon & E_sigma
+    case 4 
+        % we use default values for water, imported from Bortfeld commandline code
+        % here x is in mm but Bortfeld code is in cm
+        alpha=2.2e-3;
+        p=1.77;
+        rho=1; %mass density of medium, g/cm^3
+        R0=range(alpha,Tn,p); %R in units of cm
+        beta=0.012;
+        gamma=0.6; %fraction of energy released in the nonelastic nuclear 
+        %interactions that is absorbed locally
+        phi0=1; %primary particle fluence
+        epsilon=varargin{1}; %fraction of peak fluence in tail fluence
+        E_sigma = varargin{2};
+    % this is for all constants specified
+    case 10
+        % we use default values for water, imported from Bortfeld commandline code
+        % here x is in mm but Bortfeld code is in cm
+        alpha=varargin{3};
+        p=varargin{4};
+        rho=varargin{5}; %mass density of medium, g/cm^3
+        R0=range(alpha,Tn,p); %R in units of cm
+        beta=varargin{6};
+        gamma=varargin{7}; %fraction of energy released in the nonelastic nuclear 
+        %interactions that is absorbed locally
+        phi0=varargin{8}; %primary particle fluence
+        epsilon=varargin{1}; %fraction of peak fluence in tail fluence
+        E_sigma = varargin{2};        
+end
+% //End of edits
 
 % Range of energies for which x and L_E_T is calculated
 T=[Tn:-0.5:50 49:-0.1:5 4.8:-0.2:3.2 3.1:-0.05:1.1 1:-0.01:0.01 0.009:-0.001:0.001 0.0009:-0.0001:0.0001]*10^6; dimT=length(T)
@@ -37,7 +79,6 @@ Tcs=zeros(1,dimT); Tcshyd=zeros(1,dimT); S01=zeros(1,dimT); S10=zeros(1,dimT); s
 
 % we call in the following the function "let" for T(1) and later we call "let" for T(k)
 % for k from 2 until the end.
-
 [LET(1),Stopcs(1),Stcshyd(1),Stexc(1),StopCC(1),Tcs(1),Tcshyd(1),S01(1),S10(1),shelltot(1)]=let(T(1));
 for k=2:dimT
     % just to see if our programm is running well:
@@ -46,8 +87,7 @@ for k=2:dimT
     end
     
      %we call "let" for T(k) for k from 2 until the end.
-   [LET(k),Stopcs(k),Stcshyd(k),Stexc(k),StopCC(k),Tcs(k),Tcshyd(k),S01(k),S10(k),shelltot(k)]=let(T(k)); %Linear energy transfer
-
+    [LET(k),Stopcs(k),Stcshyd(k),Stexc(k),StopCC(k),Tcs(k),Tcshyd(k),S01(k),S10(k),shelltot(k)]=let(T(k));
     
     % LET is calculated above(of course without straggling and
     % fragmentation)and now the positions should be calculated according to equation 10 of Obolensky paper.
@@ -60,7 +100,7 @@ for k=2:dimT
     x(k)=trapz(Tp,y)+x(k-1); %Depth m
 end
 
-% figure;
+% figure(1);
 % loglog(T,Tcs, T,Tcshyd, T, S10, T, S01, T, shelltot);
 % xlabel('incidental particle energy')
 % ylabel('total cross section')
@@ -68,18 +108,22 @@ end
 x=x*10^3; %mm   x in unit of meter is converted to x in units of cm.
 LET=LET*10^-9; % MeV/mm
 
+
 % % Plot Stopping cross section
 % 
 % % a matlab figure containing experimental result for total Stopping cross
 % % section now opens
 % % to be comapred with our own results.
-% open ('Exper_stop_cross_section_prot_liq_water.fig');
-% hold on; semilogx(T,Stopcs+Stexc+Stcshyd+StopCC,T,Stopcs,T,StopCC,T,Stcshyd,T,Stexc)
-% 
+% open ('Exper_stop_cross_section_prot_liq_water.fig');hold on; 
+
+
+% figure(4);
+% semilogx(T,Stopcs+Stexc+Stcshyd+StopCC,T,Stopcs,T,StopCC,T,Stcshyd,T,Stexc)
+% % 
 % xlabel('Kinetic energy of the projectile, T (eV)'); ylabel('Stopping cross sections (eV m^2)');
 % title('\it{Stopping cross sections for liquid water}','FontSize',16); 
-% legend('Experimental','Total','Ionisation (p)','Charge Changing (p)','Ionisation (H)','Excitation (p)',1);
-
+% % legend('Experimental','Total','Ionisation (p)','Charge Changing (p)','Ionisation (H)','Excitation (p)',1);
+% legend('Total','Ionisation (p)','Charge Changing (p)','Ionisation (H)','Excitation (p)',1);
 
 % Some extra points are added at the end of the peak with LET=0, with
 % physical sense as we consider up to here that no particles will reach a
@@ -95,43 +139,56 @@ LET=[LET zeros(1,length(x)-dimT)];
 % LET which is what we want can be plotted for the Bragg peak. Note that we
 % use particle numbers and not the fluence as Kundrat suses, therfore there
 % is no need to be worried abut the wrong dimensions!
-L_E_T=straggling(x,LET); % MeV/mm
 
-% figure(1);
+% // Edited by Gabriel/Pinglin
+% // here we add a variable calculated with the extra parameters if specified
+if exist('E_sigma','var')
+    L_E_T_es=straggling(x,LET,Tn,E_sigma,alpha,p); % MeV/mm
+    L_E_T=straggling(x,LET); % MeV/mm  
+else
+    L_E_T=straggling(x,LET); % MeV/mm  
+end
+% // end of edits
+
+% figure(3);
 % plot(x,LET); xlabel('Depth, x (mm)'); ylabel('LET (MeV/mm)');
+% title('No straggling');
 
-% Addition here by Gabriel/Pinglin
-% Argument inc_analytic determines whether to call Bortfeld functions
-% Change addpath and rmpath to folder location as necessary
-figure(2); plot(x,L_E_T); xlabel('Depth, x (mm)'); ylabel('LET (MeV/mm)'); hold on;
-if (inc_analytic~=0)
+% //Addition here by Gabriel/Pinglin
+% //Argument inc_analytic determines whether to call Bortfeld functions
+% //Change addpath and rmpath to folder location as necessary
+figure(2); plot(x,L_E_T); xlabel('Depth, x (mm)'); ylabel('LET (MeV/mm)'); hold on; 
+legentries = {'Candela(monochromatic)'};
+if exist('epsilon','var')
     disp('Calling Bortfeld_1997 analytic function...');
     currfolder=pwd;
     currfolder=currfolder(1:end-12);
     bortfolder=strcat(currfolder,'Bortfeld_1997');
     addpath(bortfolder);
-    % we use default values for water, imported from Bortfeld commandline code
-    % here x is in mm but Bortfeld code is in cm
-    alpha=2.2e-3;
-    p=1.77;
-    rho=1; %mass density of medium, g/cm^3
-    R0=range(alpha,Tn,p); %R in units of cm
-    beta=0.012;
-    sigma=0.012*(R0^0.951); % changed power to 0.951, same as this code
-    gamma=0.6; %fraction of energy released in the nonelastic nuclear 
-    %interactions that is absorbed locally
-    phi0=1; %primary particle fluence
-    epsilon=0; %fraction of peak fluence in tail fluence
     % calculate
-    L_E_Tbf=dose_C(phi0,sigma,beta,alpha,gamma,Tn,p,x/10,rho,epsilon,1);
+    L_E_Tbf=dose_C(phi0,beta,alpha,gamma,Tn,p,x/10,rho,epsilon,E_sigma,1);
     L_E_Tbf=L_E_Tbf./(fluence(phi0,beta,R0,x/10)/100); %MeV mm^2 g^-1
     L_E_Tbf=L_E_Tbf.*rho*1e-3; %MeV mm^-1
+    legentries{end+1}='Bortfeld(with specified parameters)';
+    if epsilon~=0 %plot monochromatic for comparison if required
+        L_E_Tbfmono=dose_C(phi0,beta,alpha,gamma,Tn,p,x/10,rho,0,0,1);
+        L_E_Tbfmono=L_E_Tbfmono./(fluence(phi0,beta,R0,x/10)/100); %MeV mm^2 g^-1
+        L_E_Tbfmono=L_E_Tbfmono.*rho*1e-3; %MeV mm^-1
+        legentries{end+1}='Bortfeld(monochromatic)';
+        legentries{end+1}='Candela(with specified parameters)';
+    end
     % plot
-    plot(x,L_E_Tbf); legend('Candela code','Bortfeld code');
-    title(strcat(num2str(Tn),' MeV'));
+    plot(x,L_E_Tbf); hold on;
+    if epsilon~=0
+        plot(x,L_E_Tbfmono);
+        plot(x,L_E_T_es);
+    end
+    legend(legentries);
+    figtitle=title(strcat(num2str(Tn),' MeV, $\epsilon$ = ',num2str(epsilon),', $\sigma_{E,0}$ = ',num2str(E_sigma)));
+    set(figtitle,'Interpreter','Latex');
     rmpath(bortfolder);
 end
-% end of additions
+% //end of additions
 
 %SAVE x and L_E_T in a txt-file.
 myfile = fopen(namefile,'w');
@@ -148,18 +205,43 @@ fclose(myfile);
 %__________________________________________________________________________
 
 %-----------------------------------------------------------------------
-function L_E_T=straggling(x,LET)
-
+function L_E_T=straggling(x,LET,varargin)
 % Function which adds STRAGGLING and Nuclear Fragmentation given a vector
 % with the depths and their corresponding LET using Continuous Slowing Down
 % Approximation (CSDA)
+% 
+% //Edited here by Gabriel/Pinglin
+% //Define list of required variables to calculate extra energy beam spread
+% //cross-section term in order of Tn,E_sigma,alpha,p
+if nargin==6
+    Tn=varargin{1}; %units of MeV
+    E_sigma=varargin{2};
+    p=varargin{4};
+    E_alpha=varargin{3}; %renamed because of conflict, units of cm MeV^-p
+    % convert to mm MeV^-p for calculations below
+    E_alpha=E_alpha*10;
+elseif nargin>2
+    error('Error: Expected 2 or 6 arguments.');
+end
+% //End of edits
+
 A=1;
 N0=1; % Number of Incident particles
 lambda=435; %mm Mean Free Path Length for nuclear reactions
       
 [LETmax,index]=max(LET); %Determine the position and the value of the maximum of the LET.
 R0=x(index); %mm  maximum penetration depth of the projectile
+
 Sigma_Str=0.012*((R0/10)^0.951)*A^(-0.5)*10; %mm
+% // Edits by Gabriel/Pinglin to include Energy Spectrum spread
+% // here we view Sigma_Str as sigma_mono from Bortfeld paper and add the new
+% // term linearly
+if exist('E_sigma','var') % just a condition to check
+    Sigma_Str=( Sigma_Str^2+( E_sigma^2 * E_alpha^2 * p^2 * Tn^(2*p-2) ) )^0.5;
+end
+% // End of edits
+
+
 %Sigma_Str=0.012*((x/10).^0.951)*A^(-0.5)*10; %mm
 
 % x from the start of the program is in unit of mm, so is R0. 
@@ -169,12 +251,13 @@ Sigma_Str=0.012*((R0/10)^0.951)*A^(-0.5)*10; %mm
 % We later multiply the whole Sigma by 10 at the end to change Sigma from cm to mm.
 %Sigma_Str=0.012*((x/10).^0.951)*A^(-0.5)*10; %mm
 
+
+
 L_E_T=zeros(1,length(x));
 for k=1:length(x)
     if x(k)<=5 %Threshold considered below which there's no straggling
         L_E_T(k)=LET(k);
-    else
-        
+    else      
         % LET without fragmentation and straggling is put into the
         % following formula(Equatios:1,5 and 6 of Kundrat)so that straggling and
         % fragmentation is added
@@ -317,5 +400,6 @@ Stcshyd=probH*Stcshyd; % Ionisation stopping cross section by Hydrogen
 Stexc=probp*Stexc;% Excitation cross section should also be given a % probability.
 
 TCS=StopCC+Stopcs+Stcshyd+Stexc;
+
 %Linear energy transfer (eV/m)
 LET=n*TCS;
