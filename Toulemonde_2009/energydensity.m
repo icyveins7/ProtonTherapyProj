@@ -4,14 +4,18 @@
 % at a distance r from the path of an ion
 % Last edited by Ping Lin/Gabriel, 27/01/15
 
-function D2_r = energydensity(r,w,E_ion,Z)  
+function [D2_r,D1_r] = energydensity(r,w,E_ion,Z)  
     % electron energy w in units of keV
     % ion energy E_ion in units of MeV
+    % r in units of mm
     switch nargin
         case 3
             Z=1; % charge of proton
     end
+    density=1e-6;
+    r=r*density; % mm -> kg/mm^2 by multiplying by density (kg/mm^3)
     c1=1.352817016; % Ne^4/mc^2 in units of keV mm^-1
+    c1=c1*(1.60217657e-16); % J mm^-1
     lorentzfactor=(E_ion/938)+1;
     b=(1-(1/lorentzfactor)^2)^0.5;
     if (w<1)
@@ -24,24 +28,24 @@ function D2_r = energydensity(r,w,E_ion,Z)
     else
         alpha_b=1.667;
     end
-    k=6e-6; % g cm^-2 keV^-alpha_w
-    theta=range(k,w,alpha_w); % range of electron of energy w
-    capW=2*9.1e-31*(3e8)^2*b^2*(1-b^2)^-1; % kinematically limited max energy
-    T=range(k,capW,alpha_b); % max range
+    k=6e-11; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w
+    theta=range(k,w,alpha_w); % range of electron of energy w, kg mm^-2
+    capW=(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in keV
+    T=range(k,capW,alpha_b); % max range, kg mm^-2
     Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
     D1_r=zeros(1,length(r));
     D2_r=zeros(1,length(r));
     for i=1:length(r)
-        D1_r(i) = c1*(Z_star^2)*(alpha_w*b^2*r(i)*(r(i)+theta))^-1*...
-            (1-(r(i)+theta)/(r(i)+T))^(1/alpha_w);
-        if (r(i)>0.1e-6) % units in mm NOT nm
+        D1_r(i) = (c1*(Z_star^2)*(alpha_w*b^2*r(i)*(r(i)+theta))^(-1)*...
+            (1-(r(i)+theta)/(theta+T))^(1/alpha_w))*density; %J/kg, multiplying by density (kg/mm^3)
+        if (r(i)>(0.1e-6*density)) % units in mm NOT nm, multiplied by the density to compare with modified r(i) value
             C=1.5e-6+5e-6*b;
             if (b<0.03)
                 A=8*b^(1/3);
             else
                 A=19*b^(1/3);
             end
-            K_r=A*((r(i)-0.1e-6)/C)*exp(-((r(i)-0.1e-6)/C));
+            K_r=A*((r(i)/density-0.1e-6)/C)*exp(-((r(i)/density-0.1e-6)/C));
         else
             K_r=0;
         end

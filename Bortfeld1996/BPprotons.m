@@ -56,7 +56,9 @@ switch nargin
         %interactions that is absorbed locally
         phi0=varargin{8}; %primary particle fluence
         epsilon=varargin{1}; %fraction of peak fluence in tail fluence
-        E_sigma = varargin{2};        
+        E_sigma = varargin{2};
+    otherwise
+        error('Invalid number of inputs!');
 end
 % //End of edits
 
@@ -220,7 +222,7 @@ if nargin==6
     E_alpha=varargin{3}; %renamed because of conflict, units of cm MeV^-p
     % convert to mm MeV^-p for calculations below
     E_alpha=E_alpha*10;
-elseif nargin>2
+elseif nargin~=2
     error('Error: Expected 2 or 6 arguments.');
 end
 % //End of edits
