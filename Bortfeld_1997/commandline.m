@@ -6,7 +6,7 @@
 close all; clear all; clc; clear mem;
 
 % Declaring constants/parameters
-E0=1; %E0 in units of MeV
+E0=70; %E0 in units of MeV
 alpha=2.2e-3;
 p=1.77;
 rho=1; %mass density of medium, g/cm^3
@@ -65,6 +65,7 @@ dT2=(LET.*1e6*1.6e-19*1e-4)/(rho*pi*(r2*1e-9)^2*4.2);
 figure(6);
 plot(d,dT1); hold on;
 plot(d,dT2);
-ylab=ylabel('$\Delta$ T'); set(ylab,'Interpreter','Latex');
-xlabel('Depth'); 
+ylab=ylabel('$\Delta$ T/K'); set(ylab,'Interpreter','Latex');
+xlabel('Depth/m'); 
 legend(strcat('r = ',num2str(r1),'nm'), strcat('r =',num2str(r2),'nm'));
+figtitle=title(strcat(num2str(E0),' MeV proton'));
