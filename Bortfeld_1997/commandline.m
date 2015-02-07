@@ -6,7 +6,7 @@
 close all; clear all; clc; clear mem;
 
 % Declaring constants/parameters
-E0=70; %E0 in units of MeV
+E0=150; %E0 in units of MeV
 alpha=2.2e-3;
 p=1.77;
 rho=1; %mass density of medium, g/cm^3
@@ -18,8 +18,8 @@ phi0=1000; %primary particle fluence
 epsilon=0.2; %fraction of peak fluence in tail fluence
 
 % testing functions
-R=0:R0/100:R0*1.1;
-d=0:R0/100:R0*1.1;
+R=0:R0/100:R0*1.1; %cm
+d=0:R0/100:R0*1.1; %cm
 % R=0:0.1:R0;
 % d=0:0.1:R0;
 
@@ -40,8 +40,10 @@ Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho,epsilon);
 % D=dose(phi0,beta,alpha,gamma,E0,p,d,rho,0,0,0); %non-C function
 figure(4);
 % plot(d,D./flu); hold on;
-plot(d,D_z./flu); hold on;
-ylabel('Dose per fluence');
+ax=plotyy(d,D_z./flu,d,D_z*rho./flu); hold on;
+ylab=ylabel(ax(1),'Dose per fluence ($MeV g^{-1} cm^{2}$)'); set(ylab,'Interpreter','Latex');
+ylab2=ylabel(ax(2),'LET ($MeV cm^{-1}$)');set(ylab2,'Interpreter','Latex');
+xlabel('Depth (cm)');
 figtitle=title(strcat('E = ',num2str(E0),'MeV')); set(figtitle,'Interpreter','Latex');
 % figleg=legend('Matlab function','C Library'); set(figleg,'Interpreter','Latex');
 
