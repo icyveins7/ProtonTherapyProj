@@ -140,9 +140,20 @@ title('Molecular system, t=end');
 figure;
 pdeplot(p,e,t,'xydata',u(np*N/2+1:end,26),'contour','on','colormap','hot');
 title('Molecular system, t~1e-14s');
-% plot the electronic system
+% % plot the electronic system
+% figure;
+% pdeplot(p,e,t,'xydata',u(1:np*N/2,end),'contour','on','colormap','hot');
+% title('Electronic system');
+
+% molecular system temp graphs
+% find middle point, 1 nm point
+rlist=(p(1,:).^2+p(2,:).^2).^0.5;
+[u_centre,ind_centre]=min(rlist);
+nm1_pts=find(rlist>0.9 & rlist<1.1);
 figure;
-pdeplot(p,e,t,'xydata',u(1:np*N/2,end),'contour','on','colormap','hot');
-title('Electronic system');
+semilogx(tlist,u(np+ind_centre,:)); hold on;% centre 
+semilogx(tlist,u(np+nm1_pts(1),:));% 1nm
+xlabel('Time (s)'); ylabel('Temp. (K)'); 
+legend('0nm','1nm');
 
 rmpath(bortfolder);
