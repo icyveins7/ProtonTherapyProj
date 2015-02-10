@@ -9,7 +9,7 @@ close all; clear all; clc; clear mem;
 E0=100; %E0 in units of MeV
 alpha=2.2e-3;
 p=1.77;
-rho=1;
+rho=1e-3; % kg cm^-3
 maxR=range(alpha,E0,p); %R in units of cm
 d_b=maxR;
 d_a=0.5*maxR;
@@ -17,20 +17,26 @@ d_a=0.5*maxR;
 % testing functions
 R=0:0.01:maxR*1.1;
 d=0:0.01:maxR*1.1;
-D_BP_d=depthdose(alpha,E0,p,d,rho);
+D_BP_d=depthdose(alpha,E0,p,d,rho); %MeV cm^2 kg^-1
 D0=max(D_BP_d);
 
-figure(3);
-plot(d,D_BP_d); hold on;
-plot(d,abs(D_BP_d)); % probably not this one, according to paper
-plot([maxR, maxR], get(gca, 'ylim'),'--');
-legend('real','abs');
+% figure(3);
+% % % use this to check
+% % ax=plotyy(d,D_BP_d*rho,d,D_BP_d*1e6*1.602e-19); hold on;
+% % ylab=ylabel(ax(1),'LET (MeV $cm^{-1}$)'); set(ylab,'Interpreter','Latex');
+% % ylab2=ylabel(ax(2),'LET (Gy $cm^{2}$)');set(ylab2,'Interpreter','Latex');
 
-W_R=weight(alpha,p,R,D0,rho,d_a,d_b);
-figure(4);
-plot(R,W_R);hold on;
-plot([maxR, maxR], get(gca, 'ylim'),'--');
+% % plot this for report
+% plot(d,D_BP_d*1e6*1.602e-19); hold on;
+% ylab2=ylabel('$D_{BP}$ (Gy $cm^{2}$)');set(ylab2,'Interpreter','Latex');
+% plot([maxR, maxR], get(gca, 'ylim'),'--');
+% xlab=xlabel('Depth (cm)');
 
+% W_R=weight(alpha,p,R,D0,rho,d_a,d_b);
+% figure(4);
+% plot(R,W_R);hold on;
+% plot([maxR, maxR], get(gca, 'ylim'),'--');
+% 
 W_disc_R=weight_disc(alpha,p,D0,rho,d_a,d_b,0.1);
 figure(5);
 plot(W_disc_R(2,1:end),W_disc_R(1,1:end),'.-'); hold on; %goes negative??
