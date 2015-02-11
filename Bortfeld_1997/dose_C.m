@@ -18,6 +18,7 @@ function D_z=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,epsilon,E_sigma,toggle_appr
             (gamma*beta+beta/p+epsilon/R0)*parafunc_C(-1/p-1,-z(i)));
         if (isnan(D_z(i)) || D_z(i)==inf)
             if toggle_approx==1
+%                 disp(strcat('used dosehat at x=',num2str(d(i))));
                 D_z(i)=dosehat(phi0,beta,alpha,gamma,E0,p,d(i),rho, epsilon);
             end
         end

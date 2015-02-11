@@ -180,12 +180,12 @@ if exist('epsilon','var')
         legentries{end+1}='Candela(with specified parameters)';
     end
     % plot
-    plot(x,L_E_Tbf); hold on;
+    plot(x,L_E_Tbf,'^','MarkerSize',2); hold on;
     if epsilon~=0
-        plot(x,L_E_Tbfmono);
-        plot(x,L_E_T_es);
+        plot(x,L_E_Tbfmono,'k--');
+        plot(x,L_E_T_es,'o','MarkerSize',2);
     end
-    legend(legentries);
+    legend(legentries,'Location','NorthWest');
     figtitle=title(strcat(num2str(Tn),' MeV, $\epsilon$ = ',num2str(epsilon),', $\sigma_{E,0}$ = ',num2str(E_sigma)));
     set(figtitle,'Interpreter','Latex');
     rmpath(bortfolder);
