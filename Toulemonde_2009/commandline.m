@@ -97,7 +97,7 @@ gd=[1,0,0,radius]'; % circle with specified radius (in nm) centred at 0,0
 g=decsg(gd,'C1',('C1')');
 % make mesh
 [p,e,t] = initmesh(g,'hmax', radius,'MesherVersion','R2013a');
-for i=1:6
+for i=1:5
     [p,e,t] = refinemesh(g, p, e, t);
 end
 % check plots
@@ -113,7 +113,7 @@ pg = pdeGeometryFromEdges(g);
 bOuter = pdeBoundaryConditions(pg.Edges(1:4), 'u', [310,310]'); % 310K boundary conditions, both systems
 pb.BoundaryConditions = bOuter;
 
-tlist=logspace(-16,-12);
+tlist=logspace(-16,-9);
 c=[2e-7;0;2e-7;6e-10;0;6e-10]; % [Ke,K] in units of W K^-1 nm^-1 
 lmbda=2; % nm
 g_const=2e-7/(lmbda^2); % e-phonon coupling
@@ -148,12 +148,14 @@ title('Molecular system, t~1e-14s');
 % molecular system temp graphs
 % find middle point, 1 nm point
 rlist=(p(1,:).^2+p(2,:).^2).^0.5;
-[u_centre,ind_centre]=min(rlist);
-nm1_pts=find(rlist>0.9 & rlist<1.1);
+[nil,ind_centre]=min(rlist);
+[nil,ind_1]=min(abs(rlist-1));
+[nil,ind_2]=min(abs(rlist-2));
 figure;
 semilogx(tlist,u(np+ind_centre,:)); hold on;% centre 
-semilogx(tlist,u(np+nm1_pts(1),:));% 1nm
+semilogx(tlist,u(np+ind_1,:));% 1nm
+semilogx(tlist,u(np+ind_2,:));% 2nm
 xlabel('Time (s)'); ylabel('Temp. (K)'); 
-legend('0nm','1nm');
+legend(strcat(num2str(rlist(ind_centre)),' nm'), strcat(num2str(rlist(ind_1)),' nm'), strcat(num2str(rlist(ind_2)),' nm'));
 
 rmpath(bortfolder);
