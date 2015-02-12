@@ -97,7 +97,7 @@ gd=[1,0,0,radius]'; % circle with specified radius (in nm) centred at 0,0
 g=decsg(gd,'C1',('C1')');
 % make mesh
 [p,e,t] = initmesh(g,'hmax', radius,'MesherVersion','R2013a');
-for i=1:5
+for i=1:6
     [p,e,t] = refinemesh(g, p, e, t);
 end
 % check plots
@@ -146,16 +146,23 @@ title('Molecular system, t~1e-14s');
 % title('Electronic system');
 
 % molecular system temp graphs
-% find middle point, 1 nm point
+% find middle point, 1 nm point etc.
 rlist=(p(1,:).^2+p(2,:).^2).^0.5;
-[nil,ind_centre]=min(rlist);
-[nil,ind_1]=min(abs(rlist-1));
-[nil,ind_2]=min(abs(rlist-2));
 figure;
-semilogx(tlist,u(np+ind_centre,:)); hold on;% centre 
-semilogx(tlist,u(np+ind_1,:));% 1nm
-semilogx(tlist,u(np+ind_2,:));% 2nm
+legentries={};
+for i=0:0.5:5
+    [nil,ind]=min(abs(rlist-i));
+    semilogx(tlist,u(np+ind,:)); hold on;
+    legentries{end+1}=strcat(num2str(rlist(ind)),' nm');
+end
+% [nil,ind_centre]=min(rlist);
+% [nil,ind_1]=min(abs(rlist-1));
+% [nil,ind_2]=min(abs(rlist-2));
+% semilogx(tlist,u(np+ind_centre,:)); hold on;% centre 
+% semilogx(tlist,u(np+ind_1,:));% 1nm
+% semilogx(tlist,u(np+ind_2,:));% 2nm
 xlabel('Time (s)'); ylabel('Temp. (K)'); 
-legend(strcat(num2str(rlist(ind_centre)),' nm'), strcat(num2str(rlist(ind_1)),' nm'), strcat(num2str(rlist(ind_2)),' nm'));
+% legend(strcat(num2str(rlist(ind_centre)),' nm'), strcat(num2str(rlist(ind_1)),' nm'), strcat(num2str(rlist(ind_2)),' nm'));
+legend(legentries);
 
 rmpath(bortfolder);
