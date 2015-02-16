@@ -94,14 +94,18 @@ E_sigma=0.01*E0;
 % figtitle=title(strcat(num2str(E0),' MeV proton'));
 
 % Gaussian noise 
-num=1000;
+num=10000;
 E0values=normrnd(E0, 0.01*E0, [1,num]);
 D_noise=zeros(num,length(d));
 figure(7)
-for i=1:num
-    D_noise(i,1:end)=dose_C(phi0,beta,alpha,gamma,E0values(i),p,d,rho,0,0,1);
+parfor i=1:num % 4 times the speed of for loop
+    D_noise(i,:)=repmat(dose_C(phi0,beta,alpha,gamma,E0values(i),p,d,rho,0,0,1),1,1);
 %     plot(d,D_noise(i,1:end)); hold on;
 end
+% for i=1:num
+%     D_noise(i,:)=dose_C(phi0,beta,alpha,gamma,E0values(i),p,d,rho,0,0,1);
+% %     plot(d,D_noise(i,1:end)); hold on;
+% end
 plot(d,sum(D_noise)/num,'k'); hold on;
 dcompare=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,0,0.01*E0,1);
 plot(d,dcompare);

@@ -64,7 +64,7 @@ beta=0.012;
 gamma=0.6; %fraction of energy released in the nonelastic nuclear 
 %interactions that is absorbed locally
 phi0=1000; %primary particle fluence
-epsilon=0.2; %fraction of peak fluence in tail fluence
+
 depth=0:R0/100:R0*1.1; %cm
 
 % code to solve remaining proton energy at bragg peak, pasted into
@@ -90,79 +90,101 @@ rem_E_MeV=rem_E/(1.602e-19)/1e6;
 S_e=0.08*1e3*1.602e-19;
 rem_E_MeV=0.04;
 
-% calculate temperature spike at bragg peak
-radius=25;
-% make geometry description matrix
-gd=[1,0,0,radius]'; % circle with specified radius (in nm) centred at 0,0
-g=decsg(gd,'C1',('C1')');
-% make mesh
-[p,e,t] = initmesh(g,'hmax', radius,'MesherVersion','R2013a');
-for i=1:6
-    [p,e,t] = refinemesh(g, p, e, t);
-end
-% check plots
-figure;
-pdegplot(g,'edgeLabels','on');
-figure;
-pdeplot(p,e,t);
-% Create a pde entity for a PDE with 2 dependent variables
-numberOfPDE = 2;
-pb = pde(numberOfPDE);
-% Create a geometry entity
-pg = pdeGeometryFromEdges(g);
-bOuter = pdeBoundaryConditions(pg.Edges(1:4), 'u', [310,310]'); % 310K boundary conditions, both systems
-pb.BoundaryConditions = bOuter;
+% % calculate temperature spike at bragg peak
+% radius=25;
+% % make geometry description matrix
+% gd=[1,0,0,radius]'; % circle with specified radius (in nm) centred at 0,0
+% g=decsg(gd,'C1',('C1')');
+% % make mesh
+% [p,e,t] = initmesh(g,'hmax', radius,'MesherVersion','R2013a');
+% for i=1:6
+%     [p,e,t] = refinemesh(g, p, e, t);
+% end
+% % check plots
+% figure;
+% pdegplot(g,'edgeLabels','on');
+% figure;
+% pdeplot(p,e,t);
+% % Create a pde entity for a PDE with 2 dependent variables
+% numberOfPDE = 2;
+% pb = pde(numberOfPDE);
+% % Create a geometry entity
+% pg = pdeGeometryFromEdges(g);
+% bOuter = pdeBoundaryConditions(pg.Edges(1:4), 'u', [310,310]'); % 310K boundary conditions, both systems
+% pb.BoundaryConditions = bOuter;
+% 
+% tlist=logspace(-16,-9);
+% c=[2e-7;0;2e-7;6e-10;0;6e-10]; % [Ke,K] in units of W K^-1 nm^-1 
+% lmbda=2; % nm
+% g_const=2e-7/(lmbda^2); % e-phonon coupling
+% a= [g_const, -g_const, -g_const, g_const]';
+% % Ce, in J K^-1 g^-1, rho*C, in g nm^-3 J g^-1 K^-1
+% d=[3.0468e-25 0 0 4.18*rho*1e-21]'; 
+% % init conditions
+% % Assume N and p exist; N = 1 for a scalar problem
+% N=2;
+% np = size(p,2); % Number of mesh points
+% u0 = zeros(np,N); % Allocate initial matrix
+% for k = 1:np
+%     x = p(1,k);
+%     y = p(2,k);
+%     u0(k,:) = 310; % Fill in row k, constant temperature throughout, 310K
+% end
+% u0 = u0(:); % Convert to column form
+% f_placeholder=@(p,t,u,time)fcoeffunction(p,t,u,time,rem_E_MeV,bconst,S_e);
+% u = parabolic(u0,tlist,pb,p,e,t,c,a,f_placeholder,d);
+% % plot the molecular system 
+% figure;
+% pdeplot(p,e,t,'xydata',u(np*N/2+1:end,end),'contour','on','colormap','hot');
+% title('Molecular system, t=end');
+% figure;
+% pdeplot(p,e,t,'xydata',u(np*N/2+1:end,26),'contour','on','colormap','hot');
+% title('Molecular system, t~1e-14s');
+% % % plot the electronic system
+% % figure;
+% % pdeplot(p,e,t,'xydata',u(1:np*N/2,end),'contour','on','colormap','hot');
+% % title('Electronic system');
 
-tlist=logspace(-16,-9);
-c=[2e-7;0;2e-7;6e-10;0;6e-10]; % [Ke,K] in units of W K^-1 nm^-1 
+% % molecular system temp graphs
+% % find middle point, 1 nm point etc.
+% rlist=(p(1,:).^2+p(2,:).^2).^0.5;
+% figure;
+% legentries={};
+% for i=0:0.5:5
+%     [nil,ind]=min(abs(rlist-i));
+%     semilogx(tlist,u(np+ind,:)); hold on;
+%     legentries{end+1}=strcat(num2str(rlist(ind)),' nm');
+% end
+% xlabel('Time (s)'); ylabel('Temp. (K)'); 
+% legend(legentries);
+
 lmbda=2; % nm
 g_const=2e-7/(lmbda^2); % e-phonon coupling
-a= [g_const, -g_const, -g_const, g_const]';
-% Ce, in J K^-1 g^-1, rho*C, in g nm^-3 J g^-1 K^-1
-d=[3.0468e-25 0 0 4.18*rho*1e-21]'; 
-% init conditions
-% Assume N and p exist; N = 1 for a scalar problem
-N=2;
-np = size(p,2); % Number of mesh points
-u0 = zeros(np,N); % Allocate initial matrix
-for k = 1:np
-    x = p(1,k);
-    y = p(2,k);
-    u0(k,:) = 310; % Fill in row k, constant temperature throughout, 310K
-end
-u0 = u0(:); % Convert to column form
-f_placeholder=@(p,t,u,time)fcoeffunction(p,t,u,time,rem_E_MeV,bconst,S_e);
-u = parabolic(u0,tlist,pb,p,e,t,c,a,f_placeholder,d);
-% plot the molecular system 
-figure;
-pdeplot(p,e,t,'xydata',u(np*N/2+1:end,end),'contour','on','colormap','hot');
-title('Molecular system, t=end');
-figure;
-pdeplot(p,e,t,'xydata',u(np*N/2+1:end,26),'contour','on','colormap','hot');
-title('Molecular system, t~1e-14s');
-% % plot the electronic system
-% figure;
-% pdeplot(p,e,t,'xydata',u(1:np*N/2,end),'contour','on','colormap','hot');
-% title('Electronic system');
-
-% molecular system temp graphs
-% find middle point, 1 nm point etc.
-rlist=(p(1,:).^2+p(2,:).^2).^0.5;
+% g_const=g_const/25;
+pdefun=@(x,t,u,dudx)pdefun_plchold(x,t,u,dudx,rho,g_const,rem_E_MeV,bconst,S_e);
+icfun=@(x) [310;310]; % initial conditions 310K both systems
+xmesh=0:0.1:25;
+tspan=logspace(-16,-9,250);
+sol=pdepe(1,pdefun,icfun,@bcfun,xmesh,tspan);
 figure;
 legentries={};
 for i=0:0.5:5
-    [nil,ind]=min(abs(rlist-i));
-    semilogx(tlist,u(np+ind,:)); hold on;
-    legentries{end+1}=strcat(num2str(rlist(ind)),' nm');
+    [nil,ind]=min(abs(xmesh-i));
+    semilogx(tspan,sol(:,ind,2)); hold on;
+    legentries{end+1}=strcat(num2str(xmesh(ind)),' nm');
 end
-% [nil,ind_centre]=min(rlist);
-% [nil,ind_1]=min(abs(rlist-1));
-% [nil,ind_2]=min(abs(rlist-2));
-% semilogx(tlist,u(np+ind_centre,:)); hold on;% centre 
-% semilogx(tlist,u(np+ind_1,:));% 1nm
-% semilogx(tlist,u(np+ind_2,:));% 2nm
 xlabel('Time (s)'); ylabel('Temp. (K)'); 
-% legend(strcat(num2str(rlist(ind_centre)),' nm'), strcat(num2str(rlist(ind_1)),' nm'), strcat(num2str(rlist(ind_2)),' nm'));
-legend(legentries);
+legend(legentries); grid on;
+
+% % electronic system
+% figure;
+% legentries_e={};
+% for i=0:0.5:5
+%     [nil,ind]=min(abs(xmesh-i));
+%     semilogx(tspan,sol(:,ind,1)); hold on;
+%     legentries_e{end+1}=strcat(num2str(xmesh(ind)),' nm');
+% end
+% xlabel('Time (s)'); ylabel('Temp. (K)'); 
+% legend(legentries_e); grid on;
 
 rmpath(bortfolder);

@@ -21,5 +21,5 @@ f = zeros(N,nt); % Allocate f
 % Now the particular functional form of f
 % note that energydensity_r returns in J/kg, so must convert to J/g
 % S_e should be in J/nm, input rpts as mm, E_ion in MeV
-f(1,:) = bconst.*S_e.*energydensity_r(rpts.*1e-6,E_ion)./1000.*energydensity_t(time); % 1e25 factor???
+f(1,:) = bconst.*S_e.*energydensity_r(rpts.*1e-6,E_ion)./1000.*energydensity_t(time);
 f(2,:) = 0;
