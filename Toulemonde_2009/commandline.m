@@ -163,8 +163,9 @@ g_const=2e-7/(lmbda^2); % e-phonon coupling
 % g_const=g_const/25;
 pdefun=@(x,t,u,dudx)pdefun_plchold(x,t,u,dudx,rho,g_const,rem_E_MeV,bconst,S_e);
 icfun=@(x) [310;310]; % initial conditions 310K both systems
-xmesh=0:0.1:25;
-tspan=logspace(-16,-9,250);
+space_itv=0.1;
+xmesh=0:space_itv:25;
+tspan=logspace(-16,-8,250);
 sol=pdepe(1,pdefun,icfun,@bcfun,xmesh,tspan);
 figure;
 legentries={};
@@ -186,5 +187,78 @@ legend(legentries); grid on;
 % end
 % xlabel('Time (s)'); ylabel('Temp. (K)'); 
 % legend(legentries_e); grid on;
+
+
+% % make contour from radial pdepe solution
+% % start by making radial mesh, here we use m*n points per circle for the
+% % nth circle from centre
+% m=8; t_ind=108;
+% % find max temperature of that time to define colours
+% maxtemp=max(sol(t_ind,:,2));
+% figure(5);
+% for i=length(xmesh):-1:1
+%     XCON=[]; YCON=[]; TCON=[];
+%     for j=1:m*(i-1)
+%         angle=(j/(m*(i-1)))*2*pi;
+%         XCON(end+1)=xmesh(i)*cos(angle);
+%         YCON(end+1)=xmesh(i)*sin(angle);
+%         TCON(end+1)=sol(t_ind,i,2);
+%     end
+%     if i~=1
+%         %define contour colours, all in this contour should be same temperature
+%         if TCON(1)<310+(maxtemp-310)/3
+%             colour=[(TCON(1)-310)/((maxtemp-310)/3), 0, 0];
+%         elseif TCON(1)<310+2*(maxtemp-310)/3
+%             colour=[ 1, (TCON(1)-(310+(maxtemp-310)/3))/((maxtemp-310)/3), 0];
+%         else
+%             colour=[ 1, 1, (TCON(1)-(310+2*(maxtemp-310)/3))/((maxtemp-310)/3)];
+%         end
+%         fill(XCON,YCON,TCON,'FaceColor',colour,'EdgeColor',colour); hold on;
+%     end
+% end
+% title(strcat('Time: ',num2str(tspan(t_ind)),' s'));
+
+% % make movie from frames
+% m=8; frames_array(length(tspan))=struct('cdata',[],'colormap',[]);
+% fig=figure('Position',[100,100,1000,900]); %setting resolution
+% for t_ind=1:length(tspan)
+%     % find max temperature of that time to define colours
+%     % maxtemp=max(sol(t_ind,:,2));
+%     maxtemp=550;
+%     
+%     for i=length(xmesh):-1:1
+%         XCON=[]; YCON=[]; TCON=[];
+%         for j=1:m*(i-1)
+%             angle=(j/(m*(i-1)))*2*pi;
+%             XCON(end+1)=xmesh(i)*cos(angle);
+%             YCON(end+1)=xmesh(i)*sin(angle);
+%             TCON(end+1)=sol(t_ind,i,2);
+%         end
+%         if i~=1
+%             %define contour colours, all in this contour should be same temperature
+%             if TCON(1)<=310
+%                 colour=[0,0,0];
+%             elseif TCON(1)<310+(maxtemp-310)/3
+%                 colour=[(TCON(1)-310)/((maxtemp-310)/3), 0, 0];
+%             elseif TCON(1)<310+2*(maxtemp-310)/3
+%                 colour=[ 1, (TCON(1)-(310+(maxtemp-310)/3))/((maxtemp-310)/3), 0];
+%             else
+%                 colour=[ 1, 1, (TCON(1)-(310+2*(maxtemp-310)/3))/((maxtemp-310)/3)];
+%             end
+%             fill(XCON,YCON,TCON,'FaceColor',colour,'EdgeColor',colour); hold on;
+%         end
+%     end
+%     title(strcat('Time: ',num2str(tspan(t_ind)),' s'));
+%     frames_array(t_ind)=getframe(fig);
+%     clf(fig);
+% end
+% % save movie
+% save('movie.mat','frames_array');
+
+% load movie
+load('movie.mat');
+% play the movie
+mov_fig=figure('Position',[100,100,1000,900]); %setting resolution
+movie(mov_fig,frames_array,5,20)
 
 rmpath(bortfolder);
