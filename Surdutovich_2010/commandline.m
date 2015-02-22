@@ -14,7 +14,7 @@ Radius=R(beta,epsilon,rho1,t); % wavefront radius in m
 pressure=pressure2(y,t);
 
 figure(1)
-plot(Radius*1e9,pressure*1e-9); % fig2 of paper
+plot(Radius*1e9,pressure); % fig2 of paper
 xlabel('R (nm)');
 ylabel('P (nN nm^-2)');
 
