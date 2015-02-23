@@ -405,9 +405,5 @@ TCS=StopCC+Stopcs+Stcshyd+Stexc;
 
 
 if T>1
-%     do some bethe-bloch
-% LET = something
-else
 %Linear energy transfer (eV/m)
 LET=n*TCS;
-end
