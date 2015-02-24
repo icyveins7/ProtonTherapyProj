@@ -65,14 +65,14 @@ end
 % Range of energies for which x and L_E_T is calculated
 T=[Tn:-0.5:50 49:-0.1:5 4.8:-0.2:3.2 3.1:-0.05:1.1 1:-0.01:0.01 0.009:-0.001:0.001 0.0009:-0.0001:0.0001]*10^6; dimT=length(T)
 
-%According to dingfelder, Eq.57, for Stopping cross section we should consider 4 facotrs:
-%1-ionization by proton,2-excitation by proton,3-ionizatio by hydrogen
+%According to dingfelder, Eq.57, for Stopping cross section we should consider 4 factors:
+%1-ionization by proton,2-excitation by proton,3-ionization by hydrogen
 %4-charge changing( i.e. charge transfer(electron capture S10)  and   stripping(electron loss S01)  altogether ).
 LET=zeros(1,dimT); x=zeros(1,dimT); Stopcs=zeros(1,dimT); Stcshyd=zeros(1,dimT); StopCC=zeros(1,dimT); Stexc=zeros(1,dimT); % Wave=zeros(1,dimT);
 Tcs=zeros(1,dimT); Tcshyd=zeros(1,dimT); S01=zeros(1,dimT); S10=zeros(1,dimT); shelltot=zeros(1,dimT);
 
 % Here we call function let which calculates linear energy transfer but, 
-% without straggling and fragmentation. Of course the LET is calcualted
+% without straggling and fragmentation. Of course the LET is calculated
 % for the T(1) which is in fact initial energy of the projectile.
 % The LET calculated here later will be put into another function L_E_T
 % which adds straggling and fragmentation to the LET, calculated here and
@@ -94,8 +94,8 @@ for k=2:dimT
     % LET is calculated above(of course without straggling and
     % fragmentation)and now the positions should be calculated according to equation 10 of Obolensky paper.
     
-    % Here in order to speed up the calculation of the integral, the total intergral
-    % is calcualted between two successive steps and then all results are
+    % Here in order to speed up the calculation of the integral, the total integral
+    % is calculated between two successive steps and then all results are
     % added to each other. x(T)=int^{T0}_{T}(dT'/dT'/dx)
 
     Tp=[T(k) T(k-1)]; LETp=[LET(k) LET(k-1)]; y=1./LETp;
@@ -132,12 +132,12 @@ LET=LET*10^-9; % MeV/mm
 % depth larger than the Range, where the peak is located.
 x=[x x(dimT)+0.001 x(dimT)+0.01 x(dimT)+0.05 x(dimT)+0.1 x(dimT)+0.2 x(dimT)+0.5 x(dimT)+1 x(dimT)+1.3 x(dimT)+1.6 x(dimT)+2 x(dimT)+2.3 x(dimT)+2.6 x(dimT)+3 x(dimT)+3.5 x(dimT)+4 x(dimT)+4.5 x(dimT)+5 x(dimT)+5.5 x(dimT)+6 x(dimT)+6.5 x(dimT)+7 x(dimT)+7.5 x(dimT)+8];
 %the number of points we have added our length(x)-dim(T)=(length of the current x minus length of the former x)
-% and we should consdier them to be zero.
+% and we should consider them to be zero.
 LET=[LET zeros(1,length(x)-dimT)];
 
-% Now the LET which was calculated prevoiusly without straggling and
+% Now the LET which was calculated previously without straggling and
 % fragmentation is put into the following function L_E_T  and using Kundrat paper 
-%straggling and fragmentatin are added and then the final
+% straggling and fragmentatin are added and then the final
 % LET which is what we want can be plotted for the Bragg peak. Note that we
 % use particle numbers and not the fluence as Kundrat suses, therfore there
 % is no need to be worried abut the wrong dimensions!
@@ -247,7 +247,7 @@ end
 %Sigma_Str=0.012*((x/10).^0.951)*A^(-0.5)*10; %mm
 
 % x from the start of the program is in unit of mm, so is R0. 
-% R0 divided by 10 cahnges the units of R0 from mm to cm as R0 should be in cm for
+% R0 divided by 10 changes the units of R0 from mm to cm as R0 should be in cm for
 % calculating the
 % the Sigma according to Kundrat.
 % We later multiply the whole Sigma by 10 at the end to change Sigma from cm to mm.
@@ -295,15 +295,9 @@ D1=[-0.8 -0.8 -0.8 -0.8 1]; D2=[0.04 0.04 0.04 0.04 0];
 E1=[0.38 0.38 0.38 0.38 3]; alpha=[0.64 0.64 0.64 0.64 0.66];
 G=[0.99 1.11 1.11 0.52 1]; %Partitioning factor to adjust the contributions of the different subshells to the results obtained from Born approx.
 
-
-
- 
-%beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1.602*10^-19))^2); % Relativistic effects
-%gamma=1/sqrt(1-beta^2);
+beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1.602*10^-19))^2); % Relativistic effects
+gamma=1/sqrt(1-beta^2);
 %zeff=z*(1-exp(-125*beta*(z^-(2/3))));
-
-
-
 
 %IONISATION cross-section by protons and neutral hydrogen.
 v=zeros(1,5); wmax=zeros(1,5); Stopcs=0; Stcshyd=0; %Tcs=0; Tcshyd=0;
@@ -325,7 +319,7 @@ Tcs=0; Integral_Wave=0; Tcshyd=0;
        % we use "I" as defined for water vapor(and not Il), because in Rudd's
        % semi-imperical method ,data have been fitted based on water vapor and
        % nobody can do anything now. Of course the other parameters are for
-       % liquid water. Refere to Dingfelder paper, page 267, second column
+       % liquid water. Refer to Dingfelder paper, page 267, second column
        % for more explanations.
         w=[W/I(1); W/I(2); W/I(3); W/I(4); W/I(5)]; %Dimensionless normalized kinetic energy of the ejected electron
         v(i)=sqrt(m*(T)/(M*I(i))); %Dimensionless normalized velocity
@@ -362,7 +356,7 @@ Wave=Integral_Wave/Tcs; % Average energy of the secondary electrons
    % "shell" and then we calculate the stopping cross section for
    % excitation based on equation  15 of the second paper by Obolenski and
    % call it Stexc.
-  Ek=[8.17 10.13 11.31 12.91 14.5]; sigma0=10^-20; %Parameters of lenght in m and parameters of energy in eV
+  Ek=[8.17 10.13 11.31 12.91 14.5]; sigma0=10^-20; %Parameters of length in m and parameters of energy in eV
   a=[876 2084 1373 692 900]; J=[19820 23490 27770 30830 33080];
   omega=[0.85 0.88 0.88 0.78 0.78]; nu=[1 1 1 1 1];
   %C1=[3.132 3.468 3.324 3.028 3.028]; C2=[0.25 0.25 0.25 0.25 0.25];
@@ -405,9 +399,19 @@ TCS=StopCC+Stopcs+Stcshyd+Stexc;
 
 
 if T>1
-%     do some bethe-bloch
-% LET = something
+    % Bethe-bloch equation for T>1MeV
+    rho=1; % mass density of medium (g/cm^3), declared above
+    % z=1; % Projectile's charge, declared above
+    % Z=10; % Number of electrons in the target material, declared above
+    K=0.307075; % (MeV mol^-1 cm^2)
+    Am=18.015; % atomic mass of absorber/water (g mol^-1)
+    I_mean=78; % mean excitation energy (eV) <- correct, do not convert to MeV
+    mass_e=0.510998928; % electron mass (MeV/c^2)
+    mass_p=938.272046; % proton mass (MeV/c^2)
+    T_max=2*mass_e*beta^2*gamma^2/( 1+2*gamma*mass_e/mass_p+(mass_e/mass_p)^2 ); % max KE imparted to a free electron (MeV)
+    LET = rho*K*z^2*Z*Am^-1*beta^-2*(0.5*log( 2*mass_e*beta^2*gamma^2*T_max*I_mean^-2 )-beta^2);
+    % final term is ignored?
 else
-%Linear energy transfer (eV/m)
-LET=n*TCS;
+    %Linear energy transfer (eV/m)
+    LET=n*TCS;
 end

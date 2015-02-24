@@ -57,7 +57,7 @@ Z_list2=Z2(V_list2);
 pressure_2=pressure_r(xi,G_list2,Z_list2,1);
 
 figure(4);
-plot(r*1e9,pressure_2*1e3); % why 4e3?
+plot(r*1e9,pressure_2*4e3); % why 4e3?
 xlabel('r (nm)');
 ylabel('P');
 
