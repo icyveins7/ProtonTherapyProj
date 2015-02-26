@@ -412,7 +412,7 @@ if T>1e6
     % Z=10; % Number of electrons in the target material, declared above
     K=0.307075; % (MeV mol^-1 cm^2)
     Am=18.015; % atomic mass of absorber/water (g mol^-1)
-    I_mean=78e-6; % mean excitation energy (eV) <- correct, do not convert to MeV
+    I_mean=78e-6; % mean excitation energy (MeV) 
     mass_e=0.510998928; % electron mass (MeV/c^2)
     mass_p=938.272046; % proton mass (MeV/c^2)
     T_max=2*mass_e*betav^2*gamma^2/( 1+2*gamma*mass_e/mass_p+(mass_e/mass_p)^2 ); % max KE imparted to a free electron (MeV)
