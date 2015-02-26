@@ -294,10 +294,25 @@ D1=[-0.8 -0.8 -0.8 -0.8 1]; D2=[0.04 0.04 0.04 0.04 0];
 E1=[0.38 0.38 0.38 0.38 3]; alpha=[0.64 0.64 0.64 0.64 0.66];
 G=[0.99 1.11 1.11 0.52 1]; %Partitioning factor to adjust the contributions of the different subshells to the results obtained from Born approx.
 
+<<<<<<< HEAD
 % betav=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1e6*1.602*10^-19))^2); % Relativistic effects
 betav=sqrt(1-( 938.272046/( 938.272046+T ) )^2 );
 gamma=1/sqrt(1-betav^2);
 %zeff=z*(1-exp(-125*betav*(z^-(2/3))));
+=======
+<<<<<<< HEAD
+
+
+ 
+beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1.602*10^-19))^2); % Relativistic effects
+gamma=1/sqrt(1-beta^2);
+zeff=z*(1-exp(-125*beta*(z^-(2/3))));
+=======
+beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1.602*10^-19))^2); % Relativistic effects
+gamma=1/sqrt(1-beta^2);
+%zeff=z*(1-exp(-125*beta*(z^-(2/3))));
+>>>>>>> origin/master
+>>>>>>> origin/master
 
 %IONISATION cross-section by protons and neutral hydrogen.
 v=zeros(1,5); wmax=zeros(1,5); Stopcs=0; Stcshyd=0; %Tcs=0; Tcshyd=0;
@@ -322,14 +337,25 @@ Tcs=0; Integral_Wave=0; Tcshyd=0;
        % liquid water. Refer to Dingfelder paper, page 267, second column
        % for more explanations.
         w=[W/I(1); W/I(2); W/I(3); W/I(4); W/I(5)]; %Dimensionless normalized kinetic energy of the ejected electron
+<<<<<<< HEAD
         v(i)=sqrt(m*(T)/(M*I(i))); %Dimensionless normalized velocity
         
+=======
+%         v(i)=sqrt(m*(T)/(M*I(i))); %Dimensionless normalized velocity
+%         disp(v(i));
+        v(i)=sqrt(m*(beta*299792458)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity
+%         disp(v(i));
+>>>>>>> origin/master
         wmax(i)=4*(v(i)^2)-2*v(i)-R/(4*I(i));
-        F1=A1(i)*log(1+v(i)^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
+%         F1=A1(i)*log(1+v(i)^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
         
        % if we consider the F1 given by the Surdutovich paper, which has
        % some corrections compared to the Obolensky paper:
+<<<<<<< HEAD
         %F1=A1(i)*(log((1+v(i)^2)/(1-betav^2))-betav^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
+=======
+        F1=A1(i)*(log((1+v(i)^2)/(1-beta^2))-beta^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
+>>>>>>> origin/master
 
         
         F2=C2(i)*(v(i)^D2(i))*(A2(i)*v(i)^2+B2(i))/(C2(i)*v(i)^(D2(i)+4)+A2(i)*v(i)^2+B2(i));
@@ -400,6 +426,8 @@ TCS=StopCC+Stopcs+Stcshyd+Stexc;
 
 
 if T>1
+    disp(T);
+    disp('called bethe');
     % Bethe-bloch equation for T>1MeV
     rho=1; % mass density of medium (g/cm^3), declared above
     % z=1; % Projectile's charge, declared above
