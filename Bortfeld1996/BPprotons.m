@@ -63,7 +63,7 @@ end
 % //End of edits
 
 % Range of energies for which x and L_E_T is calculated
-T=[Tn:-0.5:50 49:-0.1:5 4.8:-0.2:3.2 3.1:-0.05:1.1 1:-0.01:0.01 0.009:-0.001:0.001 0.0009:-0.0001:0.0001]*10^6; dimT=length(T)
+T=[Tn:-0.5:50 49:-0.1:5 4.8:-0.2:3.2 3.1:-0.05:1.1 1:-0.01:0.01 0.009:-0.001:0.001 0.0009:-0.0001:0.0001]*10^6; dimT=length(T);
 
 %According to dingfelder, Eq.57, for Stopping cross section we should consider 4 factors:
 %1-ionization by proton,2-excitation by proton,3-ionization by hydrogen
@@ -109,7 +109,6 @@ end
 
 x=x*10^3; %mm   x in unit of meter is converted to x in units of cm.
 LET=LET*10^-9; % MeV/mm
-
 
 % % Plot Stopping cross section
 % 
@@ -295,9 +294,10 @@ D1=[-0.8 -0.8 -0.8 -0.8 1]; D2=[0.04 0.04 0.04 0.04 0];
 E1=[0.38 0.38 0.38 0.38 3]; alpha=[0.64 0.64 0.64 0.64 0.66];
 G=[0.99 1.11 1.11 0.52 1]; %Partitioning factor to adjust the contributions of the different subshells to the results obtained from Born approx.
 
-beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1.602*10^-19))^2); % Relativistic effects
-gamma=1/sqrt(1-beta^2);
-%zeff=z*(1-exp(-125*beta*(z^-(2/3))));
+% betav=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1e6*1.602*10^-19))^2); % Relativistic effects
+betav=sqrt(1-( 938.272046/( 938.272046+T ) )^2 );
+gamma=1/sqrt(1-betav^2);
+%zeff=z*(1-exp(-125*betav*(z^-(2/3))));
 
 %IONISATION cross-section by protons and neutral hydrogen.
 v=zeros(1,5); wmax=zeros(1,5); Stopcs=0; Stcshyd=0; %Tcs=0; Tcshyd=0;
@@ -323,12 +323,13 @@ Tcs=0; Integral_Wave=0; Tcshyd=0;
        % for more explanations.
         w=[W/I(1); W/I(2); W/I(3); W/I(4); W/I(5)]; %Dimensionless normalized kinetic energy of the ejected electron
         v(i)=sqrt(m*(T)/(M*I(i))); %Dimensionless normalized velocity
+        
         wmax(i)=4*(v(i)^2)-2*v(i)-R/(4*I(i));
         F1=A1(i)*log(1+v(i)^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
         
        % if we consider the F1 given by the Surdutovich paper, which has
        % some corrections compared to the Obolensky paper:
-        %F1=A1(i)*(log((1+v(i)^2)/(1-beta^2))-beta^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
+        %F1=A1(i)*(log((1+v(i)^2)/(1-betav^2))-betav^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
 
         
         F2=C2(i)*(v(i)^D2(i))*(A2(i)*v(i)^2+B2(i))/(C2(i)*v(i)^(D2(i)+4)+A2(i)*v(i)^2+B2(i));
@@ -408,8 +409,8 @@ if T>1
     I_mean=78; % mean excitation energy (eV) <- correct, do not convert to MeV
     mass_e=0.510998928; % electron mass (MeV/c^2)
     mass_p=938.272046; % proton mass (MeV/c^2)
-    T_max=2*mass_e*beta^2*gamma^2/( 1+2*gamma*mass_e/mass_p+(mass_e/mass_p)^2 ); % max KE imparted to a free electron (MeV)
-    LET = rho*K*z^2*Z*Am^-1*beta^-2*(0.5*log( 2*mass_e*beta^2*gamma^2*T_max*I_mean^-2 )-beta^2);
+    T_max=2*mass_e*betav^2*gamma^2/( 1+2*gamma*mass_e/mass_p+(mass_e/mass_p)^2 ); % max KE imparted to a free electron (MeV)
+    LET = 1e8*rho*K*z^2*Z*Am^-1*betav^-2*(0.5*log( 2*mass_e*betav^2*gamma^2*T_max*I_mean^-2 )-betav^2); % (eV/m)
     % final term is ignored?
 else
     %Linear energy transfer (eV/m)
