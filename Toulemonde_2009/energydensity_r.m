@@ -49,6 +49,13 @@ function [D2_r,D1_r] = energydensity_r(r,E_ion,varargin)
     D1_r=zeros(1,length(r));
     D2_r=zeros(1,length(r));
     for i=1:length(r)
+        if r(i)<=k*1^1.667
+            alpha=1.079;
+        else
+            alpha=1.667;
+        end
+%         D1_r(i) = (c1*(Z_star^2)*(alpha*b^2*r(i)*(r(i)+theta))^(-1)*...
+%             (1-(r(i)+theta)/(theta+T))^(1/alpha))*density; %J/kg, after multiplying by density (kg/mm^3), corrected?
         D1_r(i) = (c1*(Z_star^2)*(alpha_w*b^2*r(i)*(r(i)+theta))^(-1)*...
             (1-(r(i)+theta)/(theta+T))^(1/alpha_w))*density; %J/kg, after multiplying by density (kg/mm^3)
         if (r(i)>(0.1e-6*density)) % units in mm NOT nm, multiplied by the density to compare with modified r(i) value

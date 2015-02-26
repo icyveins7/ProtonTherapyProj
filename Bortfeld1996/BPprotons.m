@@ -298,9 +298,9 @@ G=[0.99 1.11 1.11 0.52 1]; %Partitioning factor to adjust the contributions of t
 
 
  
-%beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1.602*10^-19))^2); % Relativistic effects
-%gamma=1/sqrt(1-beta^2);
-%zeff=z*(1-exp(-125*beta*(z^-(2/3))));
+beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+T*1.602*10^-19))^2); % Relativistic effects
+gamma=1/sqrt(1-beta^2);
+zeff=z*(1-exp(-125*beta*(z^-(2/3))));
 
 
 
@@ -328,13 +328,16 @@ Tcs=0; Integral_Wave=0; Tcshyd=0;
        % liquid water. Refere to Dingfelder paper, page 267, second column
        % for more explanations.
         w=[W/I(1); W/I(2); W/I(3); W/I(4); W/I(5)]; %Dimensionless normalized kinetic energy of the ejected electron
-        v(i)=sqrt(m*(T)/(M*I(i))); %Dimensionless normalized velocity
+%         v(i)=sqrt(m*(T)/(M*I(i))); %Dimensionless normalized velocity
+%         disp(v(i));
+        v(i)=sqrt(m*(beta*299792458)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity
+%         disp(v(i));
         wmax(i)=4*(v(i)^2)-2*v(i)-R/(4*I(i));
-        F1=A1(i)*log(1+v(i)^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
+%         F1=A1(i)*log(1+v(i)^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
         
        % if we consider the F1 given by the Surdutovich paper, which has
        % some corrections compared to the Obolensky paper:
-        %F1=A1(i)*(log((1+v(i)^2)/(1-beta^2))-beta^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
+        F1=A1(i)*(log((1+v(i)^2)/(1-beta^2))-beta^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));
 
         
         F2=C2(i)*(v(i)^D2(i))*(A2(i)*v(i)^2+B2(i))/(C2(i)*v(i)^(D2(i)+4)+A2(i)*v(i)^2+B2(i));
