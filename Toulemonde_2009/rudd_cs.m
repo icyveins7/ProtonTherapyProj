@@ -1,4 +1,10 @@
-function value = rudd_cs(W)
+function value = rudd_cs(W,i,E_ion)
+
+% units of differential cross section from old code appear to be SI, except
+% for energy which is in eV i.e. final units in m^2/eV? we want it in
+% mm^2/J to convert to Gy. older rutherford energydensity_r had it in units
+% of mm and keV. so we want W in eV here, scale all conditions accordingly.
+% E_ion accepted in MeV.
 
 % constants for Rudd, arranged in ascending ionisation potential order
 A1=[1.02 1.02 1.02 1.02 1.25]; A2=[1.07 1.07 1.07 1.07 1.1];
@@ -17,16 +23,14 @@ N=2;        %Shell occupancy
 m=9.109*(10^-31); %Electron's mass (kg)
 M=(1.673*10^-27); %Proton's mass (kg)
 w=[W/I(1); W/I(2); W/I(3); W/I(4); W/I(5)]; %Dimensionless normalized kinetic energy of the ejected electron
-beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+E_ion*1.602*10^-19))^2); % Relativistic effects
+beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+E_ion*1e6*1.602*10^-19))^2); % Relativistic effects
 c=299792458;
 z=1;
-value=0;
-wmax=zeros(1,5);
-for i=1:5
-    v=sqrt(m*(beta*c)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity
-    F1=A1(i)*(log((1+v(i)^2)/(1-beta^2))-beta^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));        
-    F2=C2(i)*(v(i)^D2(i))*(A2(i)*v(i)^2+B2(i))/(C2(i)*v(i)^(D2(i)+4)+A2(i)*v(i)^2+B2(i));
-    wmax(i)=4*(v(i)^2)-2*v(i)-R/(4*I(i));
-    tcs =G(i).*((z^2)*4*pi*(a0^2)*N*(R^2)/I(i)^3).*((F1+w(i)*F2)./(((1+w(i)).^3).*(1+exp(alpha(i).*(w(i)-wmax(i))./v(i)))))'; %sdcs
-    value=value+tcs;
-end
+
+
+v=sqrt(m*(beta*c)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity
+F1=A1(i)*(log((1+v^2)/(1-beta^2))-beta^2)/(B1(i)/v^2+v^2)+(C1(i)*v^D1(i))/(1+E1(i)*v^(D1(i)+4));        
+F2=C2(i)*(v^D2(i))*(A2(i)*v^2+B2(i))/(C2(i)*v^(D2(i)+4)+A2(i)*v^2+B2(i));
+wmax=4*(v^2)-2*v-R/(4*I(i));
+value =G(i).*((z^2)*4*pi*(a0^2)*N*(R^2)/I(i)^3).*((F1+w(i,:).*F2)./(((1+w(i,:)).^3).*(1+exp(alpha(i).*(w(i,:)-wmax)./v)))); %sdcs
+

@@ -270,14 +270,40 @@ b=(1-(1/lorentzfactor)^2)^0.5; %beta
 capW=(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in keV
 k=6e-11;
 density=1e-6;
-r=1e-6;
+c1=1.352817016; % Ne^4/mc^2 in units of keV mm^-1
+c1=c1*(1.60217657e-16); % J mm^-1
+Z=1;
+Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
+
+r0=k*0.078^1.079;
+Rmax= k*capW^1.667;
+
+for r=logspace(-7,0,250) % mm
+
 lowerlimit=(r*density/k)^(1/1.079);
-% lowerlimit=(r*density/k)^(1/1.667);
-answer=integral(@testintegral,lowerlimit,capW,'RelTol',1e-15,'AbsTol',1e-15);
-wlist=lowerlimit:(capW-lowerlimit)/100000:capW;
-plot(wlist,testintegral(wlist)); hold on;
+if lowerlimit>1
+    lowerlimit=(r*density/k)^(1.667/1.079);
+end
+
+
+% smoothing out alpha from integral? ignored in original papers?
+if lowerlimit<1
+    alpha_final=(1.667*(capW-1) + 1.079*(1-lowerlimit))/(capW-lowerlimit);
+    alpha_finalreci=(1-lowerlimit)/1.079 + (capW-1)/1.667;
+else
+    alpha_final=1.667;
+    alpha_finalreci=1/1.667;
+end
+
+if lowerlimit<=capW % only run if range of energies required is less than max
+
+newintegral=@(w) testintegral(w,r);
+answer=integral(newintegral,lowerlimit,capW,'RelTol',1e-15,'AbsTol',1e-15);
+
+% wlist=lowerlimit:(capW-lowerlimit)/100000:capW;
+% plot(wlist,testintegral(wlist)); hold on;
 % plot(wlist,imag(testintegral(wlist)));
-answer_trapz=trapz(wlist,testintegral(wlist));
+% answer_trapz=trapz(wlist,testintegral(wlist));
 
 % for alpha=1.079:0.001:1.667
 %     lowerlimit=(1e-6*density/k)^(1/alpha);
@@ -286,41 +312,58 @@ answer_trapz=trapz(wlist,testintegral(wlist));
 %     plot(alpha,[9.9727e11],'s');
 % end
 
-Rmax= k*capW^1.667;
-answer_real=((1-(r*density/Rmax))^(1/1.079)) / (r*density);
+answer=answer*c1*Z_star^2/(b^2*r);
+loglog(r,answer,'rx'); hold on;
 
-r0=k*0.078^1.079;
-answer_realwithI= (1-(r*density + r0)/(Rmax + r0))^(1/1.079) / (r*density + r0);
-% answer_quad=quad(@testintegral,lowerlimit,capW);
-
-c1=1.352817016; % Ne^4/mc^2 in units of keV mm^-1
-c1=c1*(1.60217657e-16); % J mm^-1
-
-% constants for Rudd, arranged in ascending ionisation potential order
-A1=[1.02 1.02 1.02 1.02 1.25]; A2=[1.07 1.07 1.07 1.07 1.1];
-B1=[82 82 82 82 0.5]; B2=[14.6 14.6 14.6 14.6 1.3];
-C1=[0.45 0.45 0.45 0.45 1]; C2=[0.6 0.6 0.6 0.6 1];
-D1=[-0.8 -0.8 -0.8 -0.8 1]; D2=[0.04 0.04 0.04 0.04 0];
-E1=[0.38 0.38 0.38 0.38 3]; alpha=[0.64 0.64 0.64 0.64 0.66];
-G=[0.99 1.11 1.11 0.52 1];
-
-I=[12.61 14.73 18.55 32.2 539.7]; %Binding energy of the shell (water vapour) (eV)
-Il=[10.79 13.39 16.05 32.3 539]; % Binding energy for liquid water (eV)
-
-a0=0.0529*10^-9;  %Bohr radius (m)
-R=13.606;     %Rydberg constant (eV)
-N=2;        %Shell occupancy
-m=9.109*(10^-31); %Electron's mass (kg)
-M=(1.673*10^-27); %Proton's mass (kg)
-w=[W/I(1); W/I(2); W/I(3); W/I(4); W/I(5)]; %Dimensionless normalized kinetic energy of the ejected electron
-beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+E_ion*1.602*10^-19))^2); % Relativistic effects
-c=299792458;
-z=1;
-
-for i=1:5
-    v=sqrt(m*(beta*c)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity
-    F1=A1(i)*(log((1+v(i)^2)/(1-beta^2))-beta^2)/(B1(i)/v(i)^2+v(i)^2)+(C1(i)*v(i)^D1(i))/(1+E1(i)*v(i)^(D1(i)+4));        
-    F2=C2(i)*(v(i)^D2(i))*(A2(i)*v(i)^2+B2(i))/(C2(i)*v(i)^(D2(i)+4)+A2(i)*v(i)^2+B2(i));
-    wmax(i)=4*(v(i)^2)-2*v(i)-R/(4*I(i));
-    tcs =G(i).*((z^2)*4*pi*(a0^2)*N*(R^2)/I(i)^3).*((F1+w(i)*F2)./(((1+w(i)).^3).*(1+exp(alpha(i).*(w(i)-wmax(i))./v(i)))))'; %sdcs
 end
+
+answer_realwithI= (1-(r*density + r0)/(Rmax + r0))^(1/alpha_final) / (alpha_final*r*density + r0);
+answer_realwithIreci= (1-(r*density + r0)/(Rmax + r0))^(alpha_finalreci) *alpha_finalreci/ (r*density + r0);
+
+answer_realwithI=answer_realwithI*c1*Z_star^2/(b^2*r);
+answer_realwithIreci=answer_realwithIreci*c1*Z_star^2/(b^2*r);
+
+loglog(r,answer_realwithI,'bo'); loglog(r,answer_realwithIreci,'k^');
+
+end
+legend('integrated values','analytical with summation alpha fix', 'analytical with reciprocal alpha fix');
+
+% tinkering with rudd
+E_ion=1; %MeV
+lorentzfactor=(E_ion/938)+1;
+b=(1-(1/lorentzfactor)^2)^0.5; %beta
+capW=(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in keV
+k=6e-11;
+density=1e-6;
+
+Z=1;
+Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
+rlist=logspace(-7,0,250);
+
+dosecontribs=zeros(6,250);
+figure;
+for i=1:5
+    for j=1:length(rlist) % mm   
+        r=rlist(j);
+        lowerlimit=(r*density/k)^(1/1.079);
+        if lowerlimit>1
+            lowerlimit=(r*density/k)^(1.667/1.079);
+        end
+        
+        if lowerlimit<=capW % only run if range of energies required is less than max
+            % perform integrals in keV units
+            ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
+            dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',1e-15,'AbsTol',1e-15); % keV/kg -> J/kg??
+            dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j);
+        end
+    end
+    loglog(rlist,dosecontribs(i,:)); hold on;
+end
+dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
+loglog(rlist,dosecontribs(6,:));
+legend('1','2','3','4','5','total');
+
+% wlist=logspace(0,4,250);
+% rutherford=@(w) 8.5e6./(beta.^2 .* (w+78).^2); % units of eV,m
+% rutherford2=@(w) 6.510017279898618e-18./(5.444710101613867e-04*E_ion_eV.*(w+78).^2); % also eV, m
+% figure;loglog(wlist,(rudd_cs(wlist,1,1)+rudd_cs(wlist,2,1)+rudd_cs(wlist,3,1)+rudd_cs(wlist,4,1)+rudd_cs(wlist,5,1))./(rutherford(wlist)./3.343e29));
