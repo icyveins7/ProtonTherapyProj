@@ -6,11 +6,14 @@ function value=testintegral(w,r)
     
     I=0.078; %keV
 %     I=0;
+    alpha_w=zeros(1,length(w));
 
-    if (w<1)
-        alpha_w=1.079;
-    else 
-        alpha_w=1.667;
+    for i=1:length(w)
+        if (w(i)<1)
+            alpha_w(i)=1.079;
+        else 
+            alpha_w(i)=1.667;
+        end
     end
     k=6e-11; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w
     

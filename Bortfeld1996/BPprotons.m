@@ -327,7 +327,7 @@ Tcs=0; Integral_Wave=0; Tcshyd=0;
 
 %         v(i)=sqrt(m*(T)/(M*I(i))); %Dimensionless normalized velocity
 %         disp(v(i));
-        v(i)=sqrt(m*(betav*299792458)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity
+        v(i)=sqrt(m*(betav*299792458)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity, relativistic
 %         disp(v(i));
 
         wmax(i)=4*(v(i)^2)-2*v(i)-R/(4*I(i));

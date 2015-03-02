@@ -28,8 +28,10 @@ c=299792458;
 z=1;
 
 
-v=sqrt(m*(beta*c)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity
-F1=A1(i)*(log((1+v^2)/(1-beta^2))-beta^2)/(B1(i)/v^2+v^2)+(C1(i)*v^D1(i))/(1+E1(i)*v^(D1(i)+4));        
+v=sqrt(m*(beta*c)^2/(2*I(i)*1.602e-19)); %Dimensionless normalized velocity, relativistic
+% v=sqrt(m*(E_ion*1e6)/(M*I(i))); %Dimensionless normalized velocity, classical
+F1=A1(i)*(log((1+v^2)/(1-beta^2))-beta^2)/(B1(i)/v^2+v^2)+(C1(i)*v^D1(i))/(1+E1(i)*v^(D1(i)+4));    % relativistic
+% F1=A1(i)*log(1+v^2)/(B1(i)/v^2+v^2)+(C1(i)*v^D1(i))/(1+E1(i)*v^(D1(i)+4)); % classical
 F2=C2(i)*(v^D2(i))*(A2(i)*v^2+B2(i))/(C2(i)*v^(D2(i)+4)+A2(i)*v^2+B2(i));
 wmax=4*(v^2)-2*v-R/(4*I(i));
 value =G(i).*((z^2)*4*pi*(a0^2)*N*(R^2)/I(i)^3).*((F1+w(i,:).*F2)./(((1+w(i,:)).^3).*(1+exp(alpha(i).*(w(i,:)-wmax)./v)))); %sdcs
