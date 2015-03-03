@@ -288,7 +288,7 @@ r=rlist(i);
 
 lowerlimit=(r*density/k)^(1/1.079);
 if lowerlimit>1
-    lowerlimit=(r*density/k)^(1.667/1.079);
+    lowerlimit=(r*density/k)^(1/1.667);
 end
 
 
@@ -325,7 +325,7 @@ loglog(r,answer,'rx'); hold on;
 
 end
 
-answer_realwithI= (1-(r*density + r0)/(Rmax + r0))^(1/alpha_final) / (alpha_final*r*density + r0);
+answer_realwithI= (1-(r*density + r0)/(Rmax + r0))^(1/alpha_final) / (alpha_final*(r*density + r0));
 answer_realwithIreci= (1-(r*density + r0)/(Rmax + r0))^(alpha_finalreci) *alpha_finalreci/ (r*density + r0);
 
 answerwithrealI_list(i)=answer_realwithI;
@@ -357,7 +357,7 @@ for i=1:5
         r=rlist(j);
         lowerlimit=(r*density/k)^(1/1.079); %keV
         if lowerlimit>1 %keV
-            lowerlimit=(r*density/k)^(1.667/1.079);
+            lowerlimit=(r*density/k)^(1/1.667);
         end
         
         lowerlimit=lowerlimit*1000; %eV
