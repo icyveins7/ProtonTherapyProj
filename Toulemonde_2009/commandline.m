@@ -278,8 +278,8 @@ Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
 r0=k*0.078^1.079;
 Rmax= k*capW^1.667;
 
-answerwithrealI_list=zeros(1,250);
-answer_list=zeros(1,250);
+olddose_rawwithI_list=zeros(1,250);
+olddose_num_list=zeros(1,250);
 rlist=logspace(-7,0,250);
 
 figure;
@@ -305,7 +305,7 @@ if lowerlimit<=capW % only run if range of energies required is less than max
 
 newintegral=@(w) testintegral(w,r);
 % USE RELTOL = 0 TO GET RID OF COMPLEX VALUES 
-answer=integral(newintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15);
+olddose_num=integral(newintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15);
 
 % wlist=lowerlimit:(capW-lowerlimit)/100000:capW;
 % plot(wlist,testintegral(wlist)); hold on;
@@ -319,24 +319,26 @@ answer=integral(newintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15);
 %     plot(alpha,[9.9727e11],'s');
 % end
 
-answer=answer*c1*Z_star^2/(b^2*r);
-answer_list(i)=answer;
-loglog(r,answer,'rx'); hold on;
+olddose_num=olddose_num*c1*Z_star^2/(b^2*r);
+olddose_num_list(i)=olddose_num;
+loglog(r,olddose_num,'rx'); hold on;
 
 end
 
-answer_realwithI= (1-(r*density + r0)/(Rmax + r0))^(1/alpha_final) / (alpha_final*(r*density + r0));
-answer_realwithIreci= (1-(r*density + r0)/(Rmax + r0))^(alpha_finalreci) *alpha_finalreci/ (r*density + r0);
+olddose_rawwithI= (1-(r*density + r0)/(Rmax + r0))^(1/alpha_final) / (alpha_final*(r*density + r0));
+% answer_realwithIreci= (1-(r*density + r0)/(Rmax + r0))^(alpha_finalreci) *alpha_finalreci/ (r*density + r0);
 
-answerwithrealI_list(i)=answer_realwithI;
+olddose_rawwithI=olddose_rawwithI*c1*Z_star^2/(b^2*r);
+% answer_realwithIreci=answer_realwithIreci*c1*Z_star^2/(b^2*r);
 
-answer_realwithI=answer_realwithI*c1*Z_star^2/(b^2*r);
-answer_realwithIreci=answer_realwithIreci*c1*Z_star^2/(b^2*r);
+olddose_rawwithI_list(i)=olddose_rawwithI;
 
-loglog(r,answer_realwithI,'bo'); loglog(r,answer_realwithIreci,'k^');
+loglog(r,olddose_rawwithI,'bo'); 
+% loglog(r,answer_realwithIreci,'k^');
 
 end
-legend('integrated values','analytical with summation alpha fix', 'analytical with reciprocal alpha fix');
+% legend('integrated values','analytical with summation alpha fix', 'analytical with reciprocal alpha fix');
+legend('integrated values','analytical with summation alpha fix');
 
 % tinkering with rudd
 E_ion=1; %MeV
@@ -367,7 +369,7 @@ for i=1:5
             ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
             dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
-            dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19;
+            dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
         end
     end
     loglog(rlist,dosecontribs(i,:)); hold on;
@@ -376,24 +378,41 @@ dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
 loglog(rlist,dosecontribs(6,:));    
 legend('1','2','3','4','5','total');
 
+
+% show all on same graph
+[nil,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);
+[nil,olddose_fromfunc10]=energydensity_r(rlist.*1e3,E_ion,0.010); %using 10eV as I, as in waligorski
+figure;
+loglog(rlist.*1e3,dosecontribs(6,:)); % convert to mm
+hold on;
+loglog(rlist.*1e3,olddose_rawwithI_list);
+loglog(rlist.*1e3,olddose_num_list);
+loglog(rlist.*1e3,olddose_fromfunc); loglog(rlist.*1e3,olddose_fromfunc10);
+legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
+
 % graphs appear to match rudd's original paper, not dingfelder's one (which
 % are higher by a bit)
 figure;
 wlist=logspace(0,4,250); %eV
 M=(1.673*10^-27); %Proton's mass (kg)
-Elist=[0.015,0.03,0.1,0.3];
+Elist=[0.015,0.03,0.1,0.3,1];
 for i=1:length(Elist)
 E_ion=Elist(i); %MeV
 
-% V=sqrt(2*E_ion*1e6*1.602e-19/M);
 beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+E_ion*1e6*1.602*10^-19))^2); % Relativistic effects
-rutherford=@(w) 8.5e6./(beta.^2 .* (w+78).^2); % units of eV,m
+% V=sqrt(2*E_ion*1e6*1.602e-19/M);
+rutherford=@(w,I) 8.5e6./(3.343e29.*beta.^2 .* (w+I).^2); % units of eV,m
 % rutherfordclass=@(w) 8.5e6.*(2.998e8).^2./(V.^2 .* (w+12.61).^2); % units of eV,m
 % rutherford2=@(w) 6.510017279898618e-18./(5.444710101613867e-04*E_ion_eV.*(w+78).^2); % also eV, m
-loglog(wlist,(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion))./(rutherford(wlist)./3.343e29));
+loglog(wlist,(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion))./rutherford(wlist,78));
 hold on;
 end
-axis([1,10000,0.01,100]);
+axis([1,10000,0.01,1000]);
+figure; % shape of cross sections themselves, uses last value from Elist, capW from previous code (run previous bits, rmbr to use same energy)
+plotyy(acos(sqrt(wlist./capW)),(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion)),acos(sqrt(wlist./capW)),rutherford(wlist,78));
+% hold on; semilogy(acos(sqrt(wlist./capW)),rutherford(wlist,78));
+xaxis=xlabel('$\theta = cos^{-1}\sqrt{\frac{w}{W}}$'); set(xaxis,'Interpreter','Latex');
+legend('Rudd','Rutherford');
 
 % temp spike with rudd
 lmbda=2; % nm
