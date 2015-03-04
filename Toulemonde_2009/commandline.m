@@ -411,7 +411,10 @@ axis([1,10000,0.01,1000]);
 figure; % shape of cross sections themselves, uses last value from Elist, capW from previous code (run previous bits, rmbr to use same energy)
 plotyy(acos(sqrt(wlist./capW)),(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion)),acos(sqrt(wlist./capW)),rutherford(wlist,78));
 % hold on; semilogy(acos(sqrt(wlist./capW)),rutherford(wlist,78));
-xaxis=xlabel('$\theta = cos^{-1}\sqrt{\frac{w}{W}}$'); set(xaxis,'Interpreter','Latex');
+xaxis1=xlabel('$\theta = cos^{-1}\sqrt{\frac{w}{W}}$'); set(xaxis1,'Interpreter','Latex');
+legend('Rudd','Rutherford');
+figure; plotyy(sqrt(wlist./capW),(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion)),sqrt(wlist./capW),rutherford(wlist,78));
+xaxis2=xlabel('$cos \theta = \sqrt{\frac{w}{W}}$'); set(xaxis2,'Interpreter','Latex');
 legend('Rudd','Rutherford');
 
 % temp spike with rudd
