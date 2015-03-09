@@ -6,7 +6,7 @@
 close all; clear all; clc; clear mem;
 
 % Declaring constants/parameters
-E0=100; %E0 in units of MeV
+E0=13.5; %E0 in units of MeV
 alpha=2.2e-3;
 p=1.77;
 rho=1; %mass density of medium, g/cm^3
@@ -93,19 +93,50 @@ E_sigma=0.01*E0;
 % legend(strcat('r = ',num2str(r1),'nm'), strcat('r =',num2str(r2),'nm'), strcat('r =',num2str(r3),'nm'), strcat('r =',num2str(r4),'nm'), 'Location','NorthWest');
 % figtitle=title(strcat(num2str(E0),' MeV proton'));
 
-% Gaussian noise 
-num=10000;
-E0values=normrnd(E0, 0.01*E0, [1,num]);
-D_noise=zeros(num,length(d));
-figure(7)
-parfor i=1:num % 4 times the speed of for loop
-    D_noise(i,:)=repmat(dose_C(phi0,beta,alpha,gamma,E0values(i),p,d,rho,0,0,1),1,1);
-%     plot(d,D_noise(i,1:end)); hold on;
-end
-% for i=1:num
-%     D_noise(i,:)=dose_C(phi0,beta,alpha,gamma,E0values(i),p,d,rho,0,0,1);
+% % Gaussian noise 
+% num=10000;
+% E0values=normrnd(E0, 0.01*E0, [1,num]);
+% D_noise=zeros(num,length(d));
+% figure(7)
+% parfor i=1:num % 4 times the speed of for loop
+%     D_noise(i,:)=repmat(dose_C(phi0,beta,alpha,gamma,E0values(i),p,d,rho,0,0,1),1,1);
 % %     plot(d,D_noise(i,1:end)); hold on;
 % end
-plot(d,sum(D_noise)/num,'k'); hold on;
-dcompare=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,0,0.01*E0,1);
-plot(d,dcompare);
+% % for i=1:num
+% %     D_noise(i,:)=dose_C(phi0,beta,alpha,gamma,E0values(i),p,d,rho,0,0,1);
+% % %     plot(d,D_noise(i,1:end)); hold on;
+% % end
+% plot(d,sum(D_noise)/num,'k'); hold on;
+% dcompare=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,0,0.01*E0,1);
+% plot(d,dcompare);
+
+% testing integrals for remaining beam energy
+LET=(D_z./flu).*rho; %MeV/cm
+% find bragg peak
+[LETmax,maxind]=max(LET);
+ 
+LET_integral=@(d) rho.*dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,0,0,1)./fluence(phi0,beta,R0,d);
+E_rem=zeros(1,length(LET));
+betalist=zeros(1,length(LET));
+ 
+for i=1:length(E_rem)
+    E_rem(i)=E0-integral(LET_integral,0,d(i)); % MeV
+    betalist(i)=sqrt( 1 - (938.272046/(E_rem(i)+938.272046 ))^2 );
+end
+figure; plot(d,LET);
+figure; plot(d,E_rem);
+
+
+difflist=diff(betalist);
+dbeta_dzlist=zeros(1,length(LET));
+% for first and last use forward/backward approx
+dbeta_dzlist(1)=(betalist(2)-betalist(1))/(d(2)-d(1));
+dbeta_dzlist(end)=(betalist(end)-betalist(end-1))/(d(end)-d(end-1));
+for i=2:length(E_rem)-1 % for all other values use central diff
+    dbeta_dzlist(i)= (difflist(i)+difflist(i-1))/(d(i+1)-d(i-1));
+end
+figure;plot(d,dbeta_dzlist); title('dbeta/dz as function of depth'); xlabel('depth');ylabel('dbeta/dz');
+figure;plot(betalist,1./dbeta_dzlist); title('dz/dbeta as function of beta'); xlabel('beta');ylabel('dz/dbeta'); % seems correct, can plug into equation
+
+E_rem(maxind)
+d(maxind)
