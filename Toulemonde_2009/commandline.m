@@ -50,10 +50,10 @@ addpath(bortfolder);
 % E=10; %MeV
 dens=1e-6; %kg mm^-3;
 % fun=@(r)energydensity_r(r,E).*r; % r in mm
-% r_integral=integral(fun,0,1)*dens; % J mm^-1
-% r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
+% r_integral=integral(fun,0,1)*dens*2*pi; % J mm^-1
+% r_integral=r_integral*1e-6; % J nm^-1
 % t_integral=integral(@energydensity_t,0,1e-9); % integrate from - inf instead??
-% bconst=1/(t_integral*r_integral*2*pi);
+% bconst=1/(t_integral*r_integral);
 % % need to solve for value of E of proton at the bragg peak->solve for v ->
 % % insert into energydensity_r -> use LET derived from Bortfeld funcs
 % % copied
@@ -343,42 +343,47 @@ dens=1e-6; %kg mm^-3;
 % legend('integrated values','analytical with summation alpha fix');
 
 % % tinkering with rudd
-% E_ion=1.003791784863926; %MeV
-% lorentzfactor=(E_ion/938)+1;
-% b=(1-(1/lorentzfactor)^2)^0.5; %beta
-% capW=1e3*(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in eV
-% k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alpha_w
-% density=1e3; % kg m^-3
-% 
-% Z=1;
-% Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
-% rlist=logspace(-10,-3,250);
-% 
-% dosecontribs=zeros(6,250);
-% figure;
-% for i=1:5
-%     for j=1:length(rlist) % m
-%         r=rlist(j);
-%         lowerlimit=(r*density/k)^(1/1.079); %keV
-%         if lowerlimit>1 %keV
-%             lowerlimit=(r*density/k)^(1/1.667);
-%         end
-%         
-%         lowerlimit=lowerlimit*1000; %eV
-%         
-%         if lowerlimit<=capW % only run if range of energies required is less than max
-%             % perform integrals in keV units
-%             ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
-%             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
-%             dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
-%             dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
-%         end
-%     end
-%     loglog(rlist,dosecontribs(i,:)); hold on;
-% end
-% dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
-% loglog(rlist,dosecontribs(6,:));    
-% legend('1','2','3','4','5','total');
+E_ion=9.9890; %MeV
+lorentzfactor=(E_ion/938)+1;
+b=(1-(1/lorentzfactor)^2)^0.5; %beta
+capW=1e3*(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in eV
+k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alpha_w
+density=1e3; % kg m^-3
+
+Z=1;
+Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
+rlist=logspace(-10,-3,250);
+
+dosecontribs=zeros(6,250);
+figure;
+for i=1:5
+    for j=1:length(rlist) % m
+        r=rlist(j);
+        lowerlimit=(r*density/k)^(1/1.079); %keV
+        if lowerlimit>1 %keV
+            lowerlimit=(r*density/k)^(1/1.667);
+        end
+        
+        lowerlimit=lowerlimit*1000; %eV
+        
+        if lowerlimit<=capW % only run if range of energies required is less than max
+            % perform integrals in keV units
+            ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
+            dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
+            dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
+            dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
+        end
+    end
+    loglog(rlist,dosecontribs(i,:)); hold on;
+end
+dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
+loglog(rlist,dosecontribs(6,:));    
+legend('1','2','3','4','5','total');
+
+dens=1e3; %kg m^-3;
+% fun1=@(r)dosecontribs(r,9.9890).*r; % r in mm
+r_integral=trapz(rlist,dosecontribs(6,:).*rlist)*dens*2*pi; % J m^-1
+r_integral=r_integral/1.6e-19*1e-6*1e-2; % J m^-1->MeV cm^-1
 
 % % show all on same graph
 % [nil,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);

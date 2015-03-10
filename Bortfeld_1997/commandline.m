@@ -6,7 +6,7 @@
 close all; clear all; clc; clear mem;
 
 % Declaring constants/parameters
-E0=13.5; %E0 in units of MeV
+E0=15; %E0 in units of MeV
 alpha=2.2e-3;
 p=1.77;
 rho=1; %mass density of medium, g/cm^3
