@@ -83,8 +83,8 @@ function value=newdose(z1,r,z2,E0)
     w_range=k.*(w./1000).^alpha_w;
     energy_per_e=zeros(1,length(w)); value = zeros(1,length(w));
     
-%     figure; plot(z1,dists); hold on; plot(z1,w_range); 
-%     legend('dists','w_range'); 
+    figure; plot(z1,dists); hold on; plot(z1,w_range); 
+    legend('dists','w_range'); 
     
     for a=1:length(w_range)
         if w_range(a)>dists(a) % if range of electron is greater than distance from z1 to z2

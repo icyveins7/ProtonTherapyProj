@@ -48,8 +48,9 @@ addpath(bortfolder);
 % % J g K nm s
 % 
 % E=10; %MeV
+dens=1e-6; %kg mm^-3;
 % fun=@(r)energydensity_r(r,E).*r; % r in mm
-% r_integral=integral(fun,0,1); % J kg^-1 mm^2
+% r_integral=integral(fun,0,1)*dens; % J mm^-1
 % r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
 % t_integral=integral(@energydensity_t,0,1e-9); % integrate from - inf instead??
 % bconst=1/(t_integral*r_integral*2*pi);
@@ -341,43 +342,43 @@ addpath(bortfolder);
 % % legend('integrated values','analytical with summation alpha fix', 'analytical with reciprocal alpha fix');
 % legend('integrated values','analytical with summation alpha fix');
 
-% tinkering with rudd
-E_ion=1.003791784863926; %MeV
-lorentzfactor=(E_ion/938)+1;
-b=(1-(1/lorentzfactor)^2)^0.5; %beta
-capW=1e3*(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in eV
-k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alpha_w
-density=1e3; % kg m^-3
-
-Z=1;
-Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
-rlist=logspace(-10,-3,250);
-
-dosecontribs=zeros(6,250);
-figure;
-for i=1:5
-    for j=1:length(rlist) % m
-        r=rlist(j);
-        lowerlimit=(r*density/k)^(1/1.079); %keV
-        if lowerlimit>1 %keV
-            lowerlimit=(r*density/k)^(1/1.667);
-        end
-        
-        lowerlimit=lowerlimit*1000; %eV
-        
-        if lowerlimit<=capW % only run if range of energies required is less than max
-            % perform integrals in keV units
-            ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
-            dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
-            dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
-            dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
-        end
-    end
-    loglog(rlist,dosecontribs(i,:)); hold on;
-end
-dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
-loglog(rlist,dosecontribs(6,:));    
-legend('1','2','3','4','5','total');
+% % tinkering with rudd
+% E_ion=1.003791784863926; %MeV
+% lorentzfactor=(E_ion/938)+1;
+% b=(1-(1/lorentzfactor)^2)^0.5; %beta
+% capW=1e3*(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in eV
+% k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alpha_w
+% density=1e3; % kg m^-3
+% 
+% Z=1;
+% Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
+% rlist=logspace(-10,-3,250);
+% 
+% dosecontribs=zeros(6,250);
+% figure;
+% for i=1:5
+%     for j=1:length(rlist) % m
+%         r=rlist(j);
+%         lowerlimit=(r*density/k)^(1/1.079); %keV
+%         if lowerlimit>1 %keV
+%             lowerlimit=(r*density/k)^(1/1.667);
+%         end
+%         
+%         lowerlimit=lowerlimit*1000; %eV
+%         
+%         if lowerlimit<=capW % only run if range of energies required is less than max
+%             % perform integrals in keV units
+%             ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
+%             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
+%             dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
+%             dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
+%         end
+%     end
+%     loglog(rlist,dosecontribs(i,:)); hold on;
+% end
+% dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
+% loglog(rlist,dosecontribs(6,:));    
+% legend('1','2','3','4','5','total');
 
 % % show all on same graph
 % [nil,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);
@@ -428,8 +429,8 @@ addpath(bortfolder);
 
 E0=13.5; %MeV
 % E0=2;
-% r=1e-10; %m
-r= logspace(-10,-5,250);
+r=1e-10; %m
+% r= logspace(-10,-5,250);
 z2=0.217705998615886*1e-2; %m
 % % traj_start=0.217e-2; %m
 % % traj_end=0.2274e-2; %m
@@ -451,18 +452,20 @@ traj_start=z2-2e-9; %m
 traj_end=z2+2e-9; %m
 % 
 totals=zeros(1,length(r));
-parfor i=1:length(r)
+for i=1:length(r)
+z1=traj_start:(traj_end-traj_start)/10000:traj_end;
+newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
 % % integral(newdoseintegral,0.15e-2,traj_end);
 % 
-% z1=traj_start:(traj_end-traj_start)/10000:traj_end;
-% testvalues=newdoseintegral(z1);
-% % total=trapz(z1,testvalues);
-% figure; plot(z1,testvalues); 
 
-    newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
-    totals(i)=integral(newdoseintegral,traj_start,traj_end);
+testvalues=newdoseintegral(z1);
+% % total=trapz(z1,testvalues);
+figure; plot(z1,testvalues); 
+
+
+%     totals(i)=integral(newdoseintegral,traj_start,traj_end);
 end
-loglog(r,totals);
+% loglog(r,totals);
 % 
 % % %//testing speed
 % % % z1=0:0.2274e-2/1000:0.2274e-2;
