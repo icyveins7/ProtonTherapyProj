@@ -2,12 +2,12 @@
 % Last edited by Ping Lin/Gabriel, 27th Jan
 % Command line file to solve and plot temperature against time
 
-% close all; clear all; clc; clear mem;
-% 
-% currfolder=pwd;
-% currfolder=currfolder(1:end-15);
-% bortfolder=strcat(currfolder,'Bortfeld_1997');
-% addpath(bortfolder);
+close all; clear all; clc; clear mem;
+
+currfolder=pwd;
+currfolder=currfolder(1:end-15);
+bortfolder=strcat(currfolder,'Bortfeld_1997');
+addpath(bortfolder);
 % 
 % % electronic subsystem
 % % t=0:0.001:0.1;
@@ -340,7 +340,7 @@
 % end
 % % legend('integrated values','analytical with summation alpha fix', 'analytical with reciprocal alpha fix');
 % legend('integrated values','analytical with summation alpha fix');
-% 
+
 % tinkering with rudd
 E_ion=1.003791784863926; %MeV
 lorentzfactor=(E_ion/938)+1;
@@ -419,17 +419,18 @@ legend('1','2','3','4','5','total');
 % legend('Rudd','Rutherford');
 
 
-% % testing angular dist integrals
-% close all;
-% currfolder=pwd;
-% currfolder=currfolder(1:end-15);
-% bortfolder=strcat(currfolder,'Bortfeld_1997');
-% addpath(bortfolder);
-% 
-% % E0=13.5; %MeV
+% testing angular dist integrals
+close all;
+currfolder=pwd;
+currfolder=currfolder(1:end-15);
+bortfolder=strcat(currfolder,'Bortfeld_1997');
+addpath(bortfolder);
+
+E0=13.5; %MeV
 % E0=2;
-% r=1e-9; %m
-% z2=0.217705998615886*1e-2; %m
+% r=1e-10; %m
+r= logspace(-10,-5,250);
+z2=0.217705998615886*1e-2; %m
 % % traj_start=0.217e-2; %m
 % % traj_end=0.2274e-2; %m
 % 
@@ -445,18 +446,23 @@ legend('1','2','3','4','5','total');
 % % traj_start=z2-1e-8; %m
 % % traj_end=z2+1e-8; %m
 % 
-% % %  test boundaries 3
-% traj_start=z2-2e-9; %m
-% traj_end=z2+2e-9; %m
+% %  test boundaries 3
+traj_start=z2-2e-9; %m
+traj_end=z2+2e-9; %m
 % 
-% newdoseintegral=@(z1) newdose(z1, r, z2, E0);
+totals=zeros(1,length(r));
+parfor i=1:length(r)
 % % integral(newdoseintegral,0.15e-2,traj_end);
 % 
 % z1=traj_start:(traj_end-traj_start)/10000:traj_end;
 % testvalues=newdoseintegral(z1);
 % % total=trapz(z1,testvalues);
 % figure; plot(z1,testvalues); 
-% % total=integral(newdoseintegral,traj_start,traj_end);
+
+    newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
+    totals(i)=integral(newdoseintegral,traj_start,traj_end);
+end
+loglog(r,totals);
 % 
 % % %//testing speed
 % % % z1=0:0.2274e-2/1000:0.2274e-2;
@@ -486,4 +492,4 @@ legend('1','2','3','4','5','total');
 % % figure; plot(z1,E_rem); hold on; plot(z1,E_rem2);
 % % %//testing speed
 % 
-% rmpath(bortfolder);
+rmpath(bortfolder);
