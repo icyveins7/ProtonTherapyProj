@@ -453,12 +453,12 @@ newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
 
 % 
 
-% testvalues=newdoseintegral(z1);
-% % total=trapz(z1,testvalues);
+testvalues=newdoseintegral(z1);
+totals(i)=trapz(z1,testvalues);
 % figure; plot(z1,testvalues); 
 
 
-    totals(i)=integral(newdoseintegral,traj_start,traj_end);
+%     totals(i)=integral(newdoseintegral,traj_start,traj_end);
 end
 % loglog(r,totals);
 % 
