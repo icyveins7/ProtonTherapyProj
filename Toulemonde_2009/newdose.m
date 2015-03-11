@@ -57,7 +57,7 @@ function value=newdose(z1,r,z2,E0)
         no_e(j)=rudd_cs(w(j),1,E_rem(j))+rudd_cs(w(j),2,E_rem(j))+rudd_cs(w(j),3,E_rem(j))+rudd_cs(w(j),4,E_rem(j))+rudd_cs(w(j),5,E_rem(j));
     end
 %     no_e=0.5.*Ne.*no_e; % half factor
-    no_e=Ne.*no_e; %no half factor, only forward ejection?
+    no_e=(Ne/5).*no_e; %no half factor, only forward ejection?
     
     difflist=diff(w);
     dw_dzlist=zeros(1,length(w));

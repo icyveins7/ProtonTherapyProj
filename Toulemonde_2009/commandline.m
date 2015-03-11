@@ -356,6 +356,7 @@ rlist=logspace(-10,-3,250);
 
 dosecontribs=zeros(6,250);
 figure;
+warning('off','all');
 for i=1:5
     for j=1:length(rlist) % m
         r=rlist(j);
@@ -376,26 +377,15 @@ for i=1:5
     end
     loglog(rlist,dosecontribs(i,:)); hold on;
 end
+warning('on','all');
 dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
 loglog(rlist,dosecontribs(6,:));    
 legend('1','2','3','4','5','total');
 
-dens=1e3; %kg m^-3;
-% fun1=@(r)dosecontribs(r,9.9890).*r; % r in mm
-r_integral=trapz(rlist,dosecontribs(6,:).*rlist)*dens*2*pi; % J m^-1
-r_integral=r_integral/1.6e-19*1e-6*1e-2; % J m^-1->MeV cm^-1
-
-% % show all on same graph
-% [nil,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);
-% [nil,olddose_fromfunc10]=energydensity_r(rlist.*1e3,E_ion,0.010); %using 10eV as I, as in waligorski
-% figure;
-% loglog(rlist.*1e3,dosecontribs(6,:)); % convert to mm
-% hold on;
-% loglog(rlist.*1e3,olddose_rawwithI_list);
-% loglog(rlist.*1e3,olddose_num_list);
-% loglog(rlist.*1e3,olddose_fromfunc); loglog(rlist.*1e3,olddose_fromfunc10);
-% loglog(rlist.*1e3,newdoselist);
-% legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
+% dens=1e3; %kg m^-3;
+% % fun1=@(r)dosecontribs(r,9.9890).*r; % r in mm
+% r_integral=trapz(rlist,dosecontribs(6,:).*rlist)*dens*2*pi; % J m^-1
+% r_integral=r_integral/1.6e-19*1e-6*1e-2; % J m^-1->MeV cm^-1
 
 % % graphs appear to match rudd's original paper, not dingfelder's one (which
 % % are higher by a bit)
@@ -434,8 +424,8 @@ addpath(bortfolder);
 
 E0=13.5; %MeV
 % E0=2;
-r=1e-10; %m
-% r= logspace(-10,-5,250);
+% r=1e-10; %m
+r= logspace(-10,-3,250);
 z2=0.217705998615886*1e-2; %m
 % % traj_start=0.217e-2; %m
 % % traj_end=0.2274e-2; %m
@@ -460,15 +450,15 @@ totals=zeros(1,length(r));
 for i=1:length(r)
 z1=traj_start:(traj_end-traj_start)/10000:traj_end;
 newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
-% % integral(newdoseintegral,0.15e-2,traj_end);
+
 % 
 
-testvalues=newdoseintegral(z1);
+% testvalues=newdoseintegral(z1);
 % % total=trapz(z1,testvalues);
-figure; plot(z1,testvalues); 
+% figure; plot(z1,testvalues); 
 
 
-%     totals(i)=integral(newdoseintegral,traj_start,traj_end);
+    totals(i)=integral(newdoseintegral,traj_start,traj_end);
 end
 % loglog(r,totals);
 % 
@@ -500,4 +490,18 @@ end
 % % figure; plot(z1,E_rem); hold on; plot(z1,E_rem2);
 % % %//testing speed
 % 
+
+% show all on same graph
+[olddosewithcorr,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);
+% [nil,olddose_fromfunc10]=energydensity_r(rlist.*1e3,E_ion,0.010); %using 10eV as I, as in waligorski
+figure;
+loglog(rlist.*1e3,dosecontribs(6,:)); % convert to mm
+hold on;
+% loglog(rlist.*1e3,olddose_rawwithI_list);
+% loglog(rlist.*1e3,olddose_num_list);
+loglog(rlist.*1e3,olddose_fromfunc); loglog(rlist.*1e3,olddosewithcorr);
+% loglog(rlist.*1e3,olddose_fromfunc10);
+loglog(rlist.*1e3,totals);
+% legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
+
 rmpath(bortfolder);

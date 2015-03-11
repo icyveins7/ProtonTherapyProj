@@ -156,7 +156,7 @@ end
 % title('No straggling');
 
 % //Addition here by Gabriel/Pinglin
-% //Argument inc_analytic determines whether to call Bortfeld functions
+% //Arguments determine whether to call Bortfeld functions
 % //Change addpath and rmpath to folder location as necessary
 figure(2); plot(x,L_E_T); xlabel('Depth, x (mm)'); ylabel('LET (MeV/mm)'); hold on; 
 legentries = {'Candela(monochromatic)'};

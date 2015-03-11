@@ -23,4 +23,4 @@ k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alp
 % integration
 % rudd_cs accepts in eV, outputs cross section in m^2 eV^-1
 
-value= Ne.*rudd_cs(W,i,E_ion).* (W./(alpha_w.*k.*(W./1000).^(alpha_w))) .* (1 - r./(k.*(W./1000).^alpha_w)).^(1./alpha_w - 1);
+value= (Ne/5).*rudd_cs(W,i,E_ion).* (W./(alpha_w.*k.*(W./1000).^(alpha_w))) .* (1 - r./(k.*(W./1000).^alpha_w)).^(1./alpha_w - 1);
