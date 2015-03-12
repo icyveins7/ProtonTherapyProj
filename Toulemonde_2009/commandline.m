@@ -47,23 +47,24 @@ addpath(bortfolder);
 % % WANT TO WORK IN FOLLOWING UNITS, convert anything to these
 % % J g K nm s
 % 
-% E=10; %MeV
+E=0.04; %MeV
 dens=1e-6; %kg mm^-3;
 
-% fun=@(r)energydensity_r(r,E).*r; % r in mm
-% r_integral=integral(fun,0,1)*dens*2*pi; % J mm^-1
-% r_integral=r_integral*1e-6; % J nm^-1
+fun=@(r)energydensity_r(r,E).*r; % r in mm
+r_integral=integral(fun,0,1)*2*pi; % J kg^-1 mm^2
+r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
 
-% % we choose to not follow toulemonde's model, and let the radial dose
+% we choose to not follow toulemonde's model, and let the radial dose
 % determine dose directly, only normalising time portion
-% t_integral=integral(@energydensity_t,0,1e-9); % integrate from - inf instead??
-% bconst=1/(t_integral*r_integral);
+t_integral=integral(@energydensity_t,0,1e-9); % integrate from - inf instead??
+bconst=1/(t_integral*r_integral);
+
 % % need to solve for value of E of proton at the bragg peak->solve for v ->
 % % insert into energydensity_r -> use LET derived from Bortfeld funcs
 % % copied
 % alpha=2.2e-3;
 % p=1.77;
-% rho=1; %mass density of medium, g/cm^3
+rho=1; %mass density of medium, g/cm^3
 % R0=range(alpha,E,p); %R in units of cm
 % beta=0.012;
 % gamma=0.6; %fraction of energy released in the nonelastic nuclear 
@@ -91,11 +92,14 @@ dens=1e-6; %kg mm^-3;
 % rem_E_MeV=rem_E/(1.602e-19)/1e6;
 % % //
 % 
-% % override values
-% S_e=0.08*1e3*1.602e-19;
-% rem_E_MeV=0.04;
+% override values
+S_e=0.08*1e3*1.602e-19; % J nm^-1
+% S_e=1; % use dose directly from energydensity functions
+rem_E_MeV=0.04;
 
-% % calculate temperature spike at bragg peak
+% calculate temperature spike at bragg peak, using pdetool
+%{
+% 
 % radius=25;
 % % make geometry description matrix
 % gd=[1,0,0,radius]'; % circle with specified radius (in nm) centred at 0,0
@@ -162,26 +166,28 @@ dens=1e-6; %kg mm^-3;
 % end
 % xlabel('Time (s)'); ylabel('Temp. (K)'); 
 % legend(legentries);
+%}
 
-% % pdepe temp spike model (use this instead)
-% lmbda=2; % nm
-% g_const=2e-7/(lmbda^2); % e-phonon coupling
-% % g_const=g_const/25;
-% pdefun=@(x,t,u,dudx)pdefun_plchold(x,t,u,dudx,rho,g_const,rem_E_MeV,bconst,S_e);
-% icfun=@(x) [310;310]; % initial conditions 310K both systems
-% space_itv=0.1;
-% xmesh=0:space_itv:25;
-% tspan=logspace(-16,-8,250);
-% sol=pdepe(1,pdefun,icfun,@bcfun,xmesh,tspan);
-% figure;
-% legentries={};
-% for i=0:0.5:5
-%     [nil,ind]=min(abs(xmesh-i));
-%     semilogx(tspan,sol(:,ind,2)); hold on;
-%     legentries{end+1}=strcat(num2str(xmesh(ind)),' nm');
-% end
-% xlabel('Time (s)'); ylabel('Temp. (K)'); 
-% legend(legentries); grid on;
+% pdepe temp spike model (use this instead)
+lmbda=2; % nm
+g_const=2e-7/(lmbda^2); % e-phonon coupling
+% g_const=g_const/25;
+pdefun=@(x,t,u,dudx)pdefun_plchold(x,t,u,dudx,rho,g_const,rem_E_MeV,bconst,S_e);
+icfun=@(x) [310;310]; % initial conditions 310K both systems
+space_itv=0.1;
+xmesh=0:space_itv:25;
+tspan=logspace(-16,-8,250);
+sol=pdepe(1,pdefun,icfun,@bcfun,xmesh,tspan);
+figure;
+legentries={};
+for i=0:0.5:5
+    [nil,ind]=min(abs(xmesh-i));
+    semilogx(tspan,sol(:,ind,2)); hold on;
+    legentries{end+1}=strcat(num2str(xmesh(ind)),' nm');
+end
+xlabel('Time (s)'); ylabel('Temp. (K)');
+xlim([1e-15, 1e-9]);
+legend(legentries); grid on;
 
 % % electronic system
 % figure;
@@ -346,71 +352,71 @@ dens=1e-6; %kg mm^-3;
 % % legend('integrated values','analytical with summation alpha fix', 'analytical with reciprocal alpha fix');
 % legend('integrated values','analytical with summation alpha fix');
 
-% % tinkering with rudd
-E_ion=9.9890; %MeV
-lorentzfactor=(E_ion/938)+1;
-b=(1-(1/lorentzfactor)^2)^0.5; %beta
-capW=1e3*(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in eV
-k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alpha_w
-density=1e3; % kg m^-3
-
-Z=1;
-Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
-rlist=logspace(-10,-3,250);
-
-dosecontribs=zeros(6,250);
-figure;
-warning('off','all');
-for i=1:5
-    for j=1:length(rlist) % m
-        r=rlist(j);
-        lowerlimit=(r*density/k)^(1/1.079); %keV
-        if lowerlimit>1 %keV
-            lowerlimit=(r*density/k)^(1/1.667);
-        end
-        
-        lowerlimit=lowerlimit*1000; %eV
-        
-        if lowerlimit<=capW % only run if range of energies required is less than max
-            % perform integrals in keV units
-            ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
-            dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
-            dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
-            dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
-        end
-    end
-    loglog(rlist,dosecontribs(i,:)); hold on;
-end
-warning('on','all');
-dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
-loglog(rlist,dosecontribs(6,:));    
-legend('1','2','3','4','5','total');
+% % % tinkering with rudd
+% E_ion=9.9890; %MeV
+% lorentzfactor=(E_ion/938)+1;
+% b=(1-(1/lorentzfactor)^2)^0.5; %beta
+% capW=1e3*(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in eV
+% k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alpha_w
+% density=1e3; % kg m^-3
+% 
+% Z=1;
+% Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
+% rlist=logspace(-10,-3,250);
+% 
+% dosecontribs=zeros(6,250);
+% figure;
+% warning('off','all');
+% for i=1:5
+%     for j=1:length(rlist) % m
+%         r=rlist(j);
+%         lowerlimit=(r*density/k)^(1/1.079); %keV
+%         if lowerlimit>1 %keV
+%             lowerlimit=(r*density/k)^(1/1.667);
+%         end
+%         
+%         lowerlimit=lowerlimit*1000; %eV
+%         
+%         if lowerlimit<=capW % only run if range of energies required is less than max
+%             % perform integrals in keV units
+%             ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
+%             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
+%             dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
+%             dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
+%         end
+%     end
+%     loglog(rlist,dosecontribs(i,:)); hold on;
+% end
+% warning('on','all');
+% dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
+% loglog(rlist,dosecontribs(6,:));    
+% legend('1','2','3','4','5','total');
 
 % dens=1e3; %kg m^-3;
 % % fun1=@(r)dosecontribs(r,9.9890).*r; % r in mm
 % r_integral=trapz(rlist,dosecontribs(6,:).*rlist)*dens*2*pi; % J m^-1
 % r_integral=r_integral/1.6e-19*1e-6*1e-2; % J m^-1->MeV cm^-1
 
-% graphs appear to match rudd's original paper, not dingfelder's one (which
-% are higher by a bit)
-figure;
-wlist=logspace(0,4,250); %eV
-M=(1.673*10^-27); %Proton's mass (kg)
-Elist=[0.015,0.03,0.1,0.3,1];
-for i=1:length(Elist)
-E_ion=Elist(i); %MeV
-
-beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+E_ion*1e6*1.602*10^-19))^2); % Relativistic effects
-% V=sqrt(2*E_ion*1e6*1.602e-19/M);
-rutherford=@(w,I) 8.5e6./(3.343e29.*beta.^2 .* (w+I).^2); % units of eV,m
-% rutherfordclass=@(w) 8.5e6.*(2.998e8).^2./(V.^2 .* (w+12.61).^2); % units of eV,m
-% rutherford2=@(w) 6.510017279898618e-18./(5.444710101613867e-04*E_ion_eV.*(w+78).^2); % also eV, m
-loglog(wlist,(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion))./rutherford(wlist,78));
-hold on;
-end
-axis([1,10000,0.01,1000]);
-ylab=ylabel('$(d\sigma/dw)_{Rudd} / (d\sigma/dw)_{Rutherford}$'); set(ylab,'Interpreter','Latex');
-xlabel('Electron energy (eV)'); legend('0.015 MeV','0.03 MeV','0.1 MeV','0.3 MeV','1 MeV');
+% % graphs appear to match rudd's original paper, not dingfelder's one (which
+% % are higher by a bit)
+% figure;
+% wlist=logspace(0,4,250); %eV
+% M=(1.673*10^-27); %Proton's mass (kg)
+% Elist=[0.015,0.03,0.1,0.3,1];
+% for i=1:length(Elist)
+% E_ion=Elist(i); %MeV
+% 
+% beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+E_ion*1e6*1.602*10^-19))^2); % Relativistic effects
+% % V=sqrt(2*E_ion*1e6*1.602e-19/M);
+% rutherford=@(w,I) 8.5e6./(3.343e29.*beta.^2 .* (w+I).^2); % units of eV,m
+% % rutherfordclass=@(w) 8.5e6.*(2.998e8).^2./(V.^2 .* (w+12.61).^2); % units of eV,m
+% % rutherford2=@(w) 6.510017279898618e-18./(5.444710101613867e-04*E_ion_eV.*(w+78).^2); % also eV, m
+% loglog(wlist,(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion))./rutherford(wlist,78));
+% hold on;
+% end
+% axis([1,10000,0.01,1000]);
+% ylab=ylabel('$(d\sigma/dw)_{Rudd} / (d\sigma/dw)_{Rutherford}$'); set(ylab,'Interpreter','Latex');
+% xlabel('Electron energy (eV)'); legend('0.015 MeV','0.03 MeV','0.1 MeV','0.3 MeV','1 MeV');
 
 % figure; % shape of cross sections themselves, uses last value from Elist, capW from previous code (run previous bits, rmbr to use same energy)
 % plotyy(acos(sqrt(wlist./capW)),(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion)),acos(sqrt(wlist./capW)),rutherford(wlist,78));
@@ -422,93 +428,95 @@ xlabel('Electron energy (eV)'); legend('0.015 MeV','0.03 MeV','0.1 MeV','0.3 MeV
 % legend('Rudd','Rutherford');
 
 
-% testing angular dist integrals
-close all;
-currfolder=pwd;
-currfolder=currfolder(1:end-15);
-bortfolder=strcat(currfolder,'Bortfeld_1997');
-addpath(bortfolder);
-
-E0=13.5; %MeV
-% E0=2;
-% r=1e-10; %m
-r= logspace(-10,-7,250);
-z2=0.217705998615886*1e-2; %m
-% % traj_start=0.217e-2; %m
-% % traj_end=0.2274e-2; %m
+% % testing angular dist integrals
+% close all;
+% currfolder=pwd;
+% currfolder=currfolder(1:end-15);
+% bortfolder=strcat(currfolder,'Bortfeld_1997');
+% addpath(bortfolder);
 % 
-% % % test boundaries 1
-% % traj_start=z2-250e-9; %m
-% % traj_end=z2+250e-9; %m
-% 
-% % moving boundaries closer to centre does not affect total dose much
-% % used 5000 points for test boundaries 1 and 2, difference from trapz was
-% % in the fifth significant figure.
-% 
-% % % test boundaries 2
-% % traj_start=z2-1e-8; %m
-% % traj_end=z2+1e-8; %m
-% 
-% %  test boundaries 3
-traj_start=z2-2e-9; %m
-traj_end=z2+2e-9; %m
-% 
-totals=zeros(1,length(r));
-for i=1:length(r)
-z1=traj_start:(traj_end-traj_start)/10000:traj_end;
-newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
-
-% 
-
-testvalues=newdoseintegral(z1);
-totals(i)=trapz(z1,testvalues);
-% figure; plot(z1,testvalues); 
-
-
-%     totals(i)=integral(newdoseintegral,traj_start,traj_end);
-end
-% loglog(r,totals);
-% 
-% % %//testing speed
-% % % z1=0:0.2274e-2/1000:0.2274e-2;
-% % alpha=2.2e-3;
-% % p=1.77;
-% % rho=1; %mass density of medium, g/cm^3
-% % R0=range(alpha,E0,p); %R in units of cm
-% % beta=0.012;
-% % gamma=0.6; %fraction of energy released in the nonelastic nuclear 
-% % %interactions that is absorbed locally
-% % phi0=1000; %primary particle fluence
-% % epsilon=0.1; %fraction of peak fluence in tail fluence
-% % bla=100.*rho.*dose_C(phi0,beta,alpha,gamma,E0,p,z1.*100,rho,0,0,1)./fluence(phi0,beta,R0,z1.*100);
-% % LET_integral=@(z1) 100.*rho.*dose_C(phi0,beta,alpha,gamma,E0,p,z1.*100,rho,0,0,1)./fluence(phi0,beta,R0,z1.*100); % bortfeld takes in values in cm
+% E0=13.5; %MeV
+% % E0=2;
+% % r=1e-10; %m
+% r= logspace(-10,-7,250);
+% z2=0.217705998615886*1e-2; %m
+% % % traj_start=0.217e-2; %m
+% % % traj_end=0.2274e-2; %m
 % % 
-% % E_rem=zeros(1,length(z1)); E_rem2=zeros(1,length(z1));
-% % % b=zeros(1,length(z1)); %list of beta values
+% % % % test boundaries 1
+% % % traj_start=z2-250e-9; %m
+% % % traj_end=z2+250e-9; %m
 % % 
-% % for i=1:length(E_rem)
-% %     E_rem(i)=E0-integral(LET_integral,0,z1(i)); % MeV
-% % %     b(i)=sqrt( 1 - (938.272046/(E_rem(i)+938.272046 ))^2 );
-% % end
-% % for j=2:length(E_rem2)
-% %     E_rem2(j)=E_rem(1)-trapz(z1(1:j),bla(1:j));
-% % end
+% % % moving boundaries closer to centre does not affect total dose much
+% % % used 5000 points for test boundaries 1 and 2, difference from trapz was
+% % % in the fifth significant figure.
 % % 
-% % figure; plot(z1,E_rem); hold on; plot(z1,E_rem2);
-% % %//testing speed
+% % % % test boundaries 2
+% % % traj_start=z2-1e-8; %m
+% % % traj_end=z2+1e-8; %m
+% % 
+% % %  test boundaries 3
+% traj_start=z2-2e-9; %m
+% traj_end=z2+2e-9; %m
+% % 
+% totals=zeros(1,length(r));
+% for i=1:length(r)
+% z1=traj_start:(traj_end-traj_start)/10000:traj_end;
+% newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
+% 
+% % 
+% 
+% testvalues=newdoseintegral(z1);
+% totals(i)=trapz(z1,testvalues);
+% % figure; plot(z1,testvalues); 
+% 
+% 
+% %     totals(i)=integral(newdoseintegral,traj_start,traj_end);
+% end
+% % loglog(r,totals);
+% 
+% %//testing speed
+%{
+% % z1=0:0.2274e-2/1000:0.2274e-2;
+% alpha=2.2e-3;
+% p=1.77;
+% rho=1; %mass density of medium, g/cm^3
+% R0=range(alpha,E0,p); %R in units of cm
+% beta=0.012;
+% gamma=0.6; %fraction of energy released in the nonelastic nuclear 
+% %interactions that is absorbed locally
+% phi0=1000; %primary particle fluence
+% epsilon=0.1; %fraction of peak fluence in tail fluence
+% bla=100.*rho.*dose_C(phi0,beta,alpha,gamma,E0,p,z1.*100,rho,0,0,1)./fluence(phi0,beta,R0,z1.*100);
+% LET_integral=@(z1) 100.*rho.*dose_C(phi0,beta,alpha,gamma,E0,p,z1.*100,rho,0,0,1)./fluence(phi0,beta,R0,z1.*100); % bortfeld takes in values in cm
+% 
+% E_rem=zeros(1,length(z1)); E_rem2=zeros(1,length(z1));
+% % b=zeros(1,length(z1)); %list of beta values
+% 
+% for i=1:length(E_rem)
+%     E_rem(i)=E0-integral(LET_integral,0,z1(i)); % MeV
+% %     b(i)=sqrt( 1 - (938.272046/(E_rem(i)+938.272046 ))^2 );
+% end
+% for j=2:length(E_rem2)
+%     E_rem2(j)=E_rem(1)-trapz(z1(1:j),bla(1:j));
+% end
+% 
+% figure; plot(z1,E_rem); hold on; plot(z1,E_rem2);
+%}
+% %//testing speed
 % 
 
-% show all on same graph
-[olddosewithcorr,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);
-% [nil,olddose_fromfunc10]=energydensity_r(rlist.*1e3,E_ion,0.010); %using 10eV as I, as in waligorski
-figure;
-loglog(rlist.*1e3,dosecontribs(6,:)); % convert to mm
-hold on;
-% loglog(rlist.*1e3,olddose_rawwithI_list);
-% loglog(rlist.*1e3,olddose_num_list);
-loglog(rlist.*1e3,olddose_fromfunc); loglog(rlist.*1e3,olddosewithcorr);
-% loglog(rlist.*1e3,olddose_fromfunc10);
-loglog(r.*1e3,totals);
-% legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
+% % show all on same graph
+% [olddosewithcorr,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);
+% % [nil,olddose_fromfunc10]=energydensity_r(rlist.*1e3,E_ion,0.010); %using 10eV as I, as in waligorski
+% figure;
+% loglog(rlist.*1e3,dosecontribs(6,:)); % convert to mm
+% hold on;
+% % loglog(rlist.*1e3,olddose_rawwithI_list);
+% % loglog(rlist.*1e3,olddose_num_list);
+% loglog(rlist.*1e3,olddose_fromfunc); loglog(rlist.*1e3,olddosewithcorr);
+% % loglog(rlist.*1e3,olddose_fromfunc10);
+% loglog(r.*1e3,totals);
+% % legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
 
 rmpath(bortfolder);

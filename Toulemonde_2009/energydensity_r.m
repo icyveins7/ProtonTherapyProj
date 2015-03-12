@@ -14,7 +14,7 @@ function [D2_r,D1_r] = energydensity_r(r,E_ion,varargin)
     % r in units of mm
     switch nargin
         case 2 % default values
-            w=0.078; %keV
+            w=0.010; %keV
             Z=1;
         case 3   
             w=varargin{1};
