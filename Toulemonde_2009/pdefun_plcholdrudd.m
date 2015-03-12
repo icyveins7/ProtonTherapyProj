@@ -14,8 +14,8 @@ function [c,f,s]=pdefun_plcholdrudd(x,t,u,dudx,rho,g,E_ion,bconst,S_e)
     if u(1)<=u(2)
         g=0;
     end
-
-    E_r=rudd_density(x*1e-9,E_ion)./1000; % J g^-1
+%     E_r=energydensity_r(x*1e-6,E_ion)./1000; % J g^-1
+    E_r=x*1e-9
     E_t=energydensity_t(t);
     s=[-g*(u(1)-u(2)) + bconst.*S_e.*E_r.*E_t;
         g*(u(1)-u(2))];

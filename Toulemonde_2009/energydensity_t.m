@@ -9,7 +9,7 @@ function D_t= energydensity_t(t,varargin)
     switch nargin
         case 1 % default values
             t0=1e-15; % in seconds
-            s=1e-14; % in seconds
+            s=1e-13; % in seconds
         case 3
             t0=varargin{1};
             s=varargin{2};
