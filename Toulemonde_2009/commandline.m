@@ -503,4 +503,25 @@ legend(legentries); grid on;
 % loglog(r.*1e3,totals);
 % % legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
 
+% % electron range
+%{
+% wlist=logspace(0,6,1000); %eV
+% wlist=wlist/1000; %keV
+% dens1=1e-6; %kg mm^-3;
+% k=6e-11; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w
+% alphalist=zeros(1,length(wlist));
+% for i=1:length(alphalist)
+%     if (wlist(i)<1)
+%         alphalist(i)=1.079; 
+%     else
+%         alphalist(i)=1.667;
+%     end
+% end
+% rangelist=zeros(1,length(wlist));
+% for r=1:length(rangelist)
+%     rangelist(r)=range(k,wlist(r),alphalist(r))/dens1; %mm
+% end
+% figure(), loglog(wlist*1000,rangelist*1e6);
+%}
+
 rmpath(bortfolder);
