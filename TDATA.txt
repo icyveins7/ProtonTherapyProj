@@ -7,11 +7,11 @@
     Recoil/Damage Calculations made with Kinchin-Pease Estimates    
 --------------------------------------------------------------------
 Ion =  H ( 1)   Ion Mass= 001.0080
-Energy  = 1000000.E-02 keV
+Energy  = 1500000.E-02 keV
 Ion Angle to Surface = 0 degrees
 ============= TARGET MATERIAL ======================================
   Layer # 1 - Water_Liquid (ICRU-276)
-  Layer # 1 - Bottom Depth=     1.E+07 A
+  Layer # 1 - Bottom Depth=     3.E+07 A
   Layer # 1- Density = 10.02E22 atoms/cm3 = 1 g/cm3
   Layer # 1-  H = 66.6 Atomic Percent = 11.1 Mass Percent
   Layer # 1-  O = 33.3 Atomic Percent = 88.8 Mass Percent
@@ -21,14 +21,14 @@ Target energies for target atom =  H
 Target energies for target atom =  O
     Displacement = 28 eV, Binding = 3 eV, Surface = 2 eV
 ====================================================================
-Depth Range of Tabulated Data=  000000.E+00  -  130000.E+02  Angstroms
+Depth Range of Tabulated Data=  000000.E+00  -  300000.E+02  Angstroms
 ====================================================================
-Total Ions calculated =  027302
-Average Range         =   12047.E+03 Angstroms
-Average Straggling    =   21603.E+01 Angstroms
-Average Vacancy/Ion   =   65038.E-03
+Total Ions calculated =  009394
+Average Range         =   24903.E+03 Angstroms
+Average Straggling    =   45709.E+01 Angstroms
+Average Vacancy/Ion   =   81715.E-03
 ====================================================================
-Total Backscattered Ions=  2 
+Total Backscattered Ions=  0 
 Total Transmitted Ions  =  0 
 ====================================================================
 See files SRIM Outputs\*.txt for tables :

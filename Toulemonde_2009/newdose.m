@@ -57,7 +57,7 @@ function value=newdose(z1,r,z2,E0)
         no_e(j)=rudd_cs(w(j),1,E_rem(j))+rudd_cs(w(j),2,E_rem(j))+rudd_cs(w(j),3,E_rem(j))+rudd_cs(w(j),4,E_rem(j))+rudd_cs(w(j),5,E_rem(j));
     end
 %     no_e=0.5.*Ne.*no_e; % half factor
-    no_e=Ne.*no_e; %no half factor, only forward ejection?
+    no_e=(Ne/5).*no_e; %no half factor, only forward ejection?
     
     difflist=diff(w);
     dw_dzlist=zeros(1,length(w));
@@ -83,15 +83,15 @@ function value=newdose(z1,r,z2,E0)
     w_range=k.*(w./1000).^alpha_w;
     energy_per_e=zeros(1,length(w)); value = zeros(1,length(w));
     
-    figure; plot(z1,dists); hold on; plot(z1,w_range); 
-    legend('dists','w_range'); 
+%     figure; plot(z1,dists); hold on; plot(z1,w_range); 
+%     legend('dists','w_range'); 
     
     for a=1:length(w_range)
         if w_range(a)>dists(a) % if range of electron is greater than distance from z1 to z2
             if phi(a)>=0 % only add from forward ejection
             energy_per_e(a)=(w(a)./(alpha_w(a).*k.*(w(a)./1000).^(alpha_w(a)))) .* (1 - dists(a)./(k.*(w(a)./1000).^alpha_w(a))).^(1./alpha_w(a) - 1);
     
-            value(a) = (2*pi.*r).^(-1) .* no_e(a) .* energy_per_e(a) .*abs(dw_dzlist(a));
+            value(a) = (1.*(1-exp(-125.*b(a).*1.^(-2/3)))).^2.*(2*pi.*r).^(-1) .* no_e(a) .* energy_per_e(a) .*abs(dw_dzlist(a));
             value(a) = value(a)*1.602e-19; % convert from eV/kg to J/kg
             end
         else
