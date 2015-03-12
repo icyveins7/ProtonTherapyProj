@@ -8,20 +8,7 @@ currfolder=pwd;
 currfolder=currfolder(1:end-15);
 bortfolder=strcat(currfolder,'Bortfeld_1997');
 addpath(bortfolder);
-% 
-% % electronic subsystem
-% % t=0:0.001:0.1;
-% % initial_Te=310;
-% % [Te,t]=ode45(@electrontempfunc, t, initial_Te);
-% % figure(1);
-% % plot(t,Te);
-% 
-% % molecular subsystem
-% % t=0:0.001:0.1;
-% % initial_T=310;
-% % [T,t]=ode45(@moleculartempfunc, t, initial_T);
-% % figure(2);
-% % plot(t,T);
+
 % 
 % % Energy density tests
 % r=logspace(-7,0,250); % mm
@@ -50,7 +37,8 @@ addpath(bortfolder);
 E=0.04; %MeV
 dens=1e-6; %kg mm^-3;
 
-fun=@(r)energydensity_r(r,E).*r; % r in mm
+% fun=@(r)energydensity_r(r,E).*r; % r in mm
+fun=@(r)rudd_density(r.*1e-3,E).*r; % r in mm
 r_integral=integral(fun,0,1)*2*pi; % J kg^-1 mm^2
 r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
 
@@ -204,6 +192,7 @@ legend(legentries); grid on;
 % % make contour from radial pdepe solution
 % % start by making radial mesh, here we use m*n points per circle for the
 % % nth circle from centre
+%{
 % m=8; t_ind=108;
 % % find max temperature of that time to define colours
 % maxtemp=max(sol(t_ind,:,2));
@@ -273,7 +262,7 @@ legend(legentries); grid on;
 % mov_fig=figure('Position',[100,100,1000,900]); %setting resolution
 % movie(mov_fig,frames_array,5,20)
 % 
-% rmpath(bortfolder);
+%}
 % 
 % % testing
 % E_ion=1; %MeV
