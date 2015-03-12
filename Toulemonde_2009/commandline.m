@@ -24,20 +24,20 @@ addpath(bortfolder);
 % % plot(t,T);
 % 
 % % Energy density tests
-% % r=logspace(-7,0,250); % mm
-% % [e1,e1_1]=energydensity_r(r,1);
-% % [e10,e10_1]=energydensity_r(r,10);
-% % [e20,e20_1]=energydensity_r(r,20);
-% % [e50,e50_1]=energydensity_r(r,50);
-% % [e100,e100_1]=energydensity_r(r,100);
-% % figure(3);
-% % loglog(r*1e6,e1,'b'); hold on; loglog(r*1e6,e1_1,'b--');
-% % loglog(r*1e6,e10,'r'); loglog(r*1e6,e10_1,'r--');
-% % loglog(r*1e6,e20,'Color',[0,0.5,1]); loglog(r*1e6,e20_1,'Color',[0,0.5,1],'LineStyle','--');
-% % loglog(r*1e6,e50,'k'); loglog(r*1e6,e50_1,'k--');
-% % loglog(r*1e6,e100,'m'); loglog(r*1e6,e100_1,'m--');
-% % legend('1 MeV','1 MeV(without correction)','10 MeV','10 MeV(without correction)','20 MeV','20 MeV(without correction)','50 MeV','50 MeV(without correction)','100 MeV','100MeV(without correction)');
-% % ylim([1e-8, 1e7]);
+% r=logspace(-7,0,250); % mm
+% [e1,e1_1]=energydensity_r(r,1);
+% [e10,e10_1]=energydensity_r(r,10);
+% [e20,e20_1]=energydensity_r(r,20);
+% [e50,e50_1]=energydensity_r(r,50);
+% [e100,e100_1]=energydensity_r(r,100);
+% figure(3);
+% loglog(r*1e6,e1,'b'); hold on; loglog(r*1e6,e1_1,'b--');
+% loglog(r*1e6,e10,'r'); loglog(r*1e6,e10_1,'r--');
+% loglog(r*1e6,e20,'Color',[0,0.5,1]); loglog(r*1e6,e20_1,'Color',[0,0.5,1],'LineStyle','--');
+% loglog(r*1e6,e50,'k'); loglog(r*1e6,e50_1,'k--');
+% loglog(r*1e6,e100,'m'); loglog(r*1e6,e100_1,'m--');
+% legend('1 MeV','1 MeV(without correction)','10 MeV','10 MeV(without correction)','20 MeV','20 MeV(without correction)','50 MeV','50 MeV(without correction)','100 MeV','100MeV(without correction)');
+% ylim([1e-8, 1e7]); xlabel('Radius (nm)'); ylabel('Dose (Gy)');
 % 
 % % // all code between // used in fcoefffunction, just typed here for
 % % // checking purposes
@@ -49,9 +49,13 @@ addpath(bortfolder);
 % 
 % E=10; %MeV
 dens=1e-6; %kg mm^-3;
+
 % fun=@(r)energydensity_r(r,E).*r; % r in mm
 % r_integral=integral(fun,0,1)*dens*2*pi; % J mm^-1
 % r_integral=r_integral*1e-6; % J nm^-1
+
+% % we choose to not follow toulemonde's model, and let the radial dose
+% determine dose directly, only normalising time portion
 % t_integral=integral(@energydensity_t,0,1e-9); % integrate from - inf instead??
 % bconst=1/(t_integral*r_integral);
 % % need to solve for value of E of proton at the bragg peak->solve for v ->
@@ -387,24 +391,27 @@ legend('1','2','3','4','5','total');
 % r_integral=trapz(rlist,dosecontribs(6,:).*rlist)*dens*2*pi; % J m^-1
 % r_integral=r_integral/1.6e-19*1e-6*1e-2; % J m^-1->MeV cm^-1
 
-% % graphs appear to match rudd's original paper, not dingfelder's one (which
-% % are higher by a bit)
-% figure;
-% wlist=logspace(0,4,250); %eV
-% M=(1.673*10^-27); %Proton's mass (kg)
-% Elist=[0.015,0.03,0.1,0.3,1];
-% for i=1:length(Elist)
-% E_ion=Elist(i); %MeV
-% 
-% beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+E_ion*1e6*1.602*10^-19))^2); % Relativistic effects
-% % V=sqrt(2*E_ion*1e6*1.602e-19/M);
-% rutherford=@(w,I) 8.5e6./(3.343e29.*beta.^2 .* (w+I).^2); % units of eV,m
-% % rutherfordclass=@(w) 8.5e6.*(2.998e8).^2./(V.^2 .* (w+12.61).^2); % units of eV,m
-% % rutherford2=@(w) 6.510017279898618e-18./(5.444710101613867e-04*E_ion_eV.*(w+78).^2); % also eV, m
-% loglog(wlist,(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion))./rutherford(wlist,78));
-% hold on;
-% end
-% axis([1,10000,0.01,1000]);
+% graphs appear to match rudd's original paper, not dingfelder's one (which
+% are higher by a bit)
+figure;
+wlist=logspace(0,4,250); %eV
+M=(1.673*10^-27); %Proton's mass (kg)
+Elist=[0.015,0.03,0.1,0.3,1];
+for i=1:length(Elist)
+E_ion=Elist(i); %MeV
+
+beta=sqrt(1-(M*(2.998*10^8)^2/(M*(2.998*10^8)^2+E_ion*1e6*1.602*10^-19))^2); % Relativistic effects
+% V=sqrt(2*E_ion*1e6*1.602e-19/M);
+rutherford=@(w,I) 8.5e6./(3.343e29.*beta.^2 .* (w+I).^2); % units of eV,m
+% rutherfordclass=@(w) 8.5e6.*(2.998e8).^2./(V.^2 .* (w+12.61).^2); % units of eV,m
+% rutherford2=@(w) 6.510017279898618e-18./(5.444710101613867e-04*E_ion_eV.*(w+78).^2); % also eV, m
+loglog(wlist,(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion))./rutherford(wlist,78));
+hold on;
+end
+axis([1,10000,0.01,1000]);
+ylab=ylabel('$(d\sigma/dw)_{Rudd} / (d\sigma/dw)_{Rutherford}$'); set(ylab,'Interpreter','Latex');
+xlabel('Electron energy (eV)'); legend('0.015 MeV','0.03 MeV','0.1 MeV','0.3 MeV','1 MeV');
+
 % figure; % shape of cross sections themselves, uses last value from Elist, capW from previous code (run previous bits, rmbr to use same energy)
 % plotyy(acos(sqrt(wlist./capW)),(rudd_cs(wlist,1,E_ion)+rudd_cs(wlist,2,E_ion)+rudd_cs(wlist,3,E_ion)+rudd_cs(wlist,4,E_ion)+rudd_cs(wlist,5,E_ion)),acos(sqrt(wlist./capW)),rutherford(wlist,78));
 % % hold on; semilogy(acos(sqrt(wlist./capW)),rutherford(wlist,78));
@@ -425,7 +432,7 @@ addpath(bortfolder);
 E0=13.5; %MeV
 % E0=2;
 % r=1e-10; %m
-r= logspace(-10,-3,250);
+r= logspace(-10,-7,250);
 z2=0.217705998615886*1e-2; %m
 % % traj_start=0.217e-2; %m
 % % traj_end=0.2274e-2; %m
@@ -501,7 +508,7 @@ hold on;
 % loglog(rlist.*1e3,olddose_num_list);
 loglog(rlist.*1e3,olddose_fromfunc); loglog(rlist.*1e3,olddosewithcorr);
 % loglog(rlist.*1e3,olddose_fromfunc10);
-loglog(rlist.*1e3,totals);
+loglog(r.*1e3,totals);
 % legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
 
 rmpath(bortfolder);
