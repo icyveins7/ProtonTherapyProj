@@ -37,11 +37,12 @@ addpath(bortfolder);
 E=0.04; %MeV
 dens=1e-6; %kg mm^-3;
 
-fun=@(r)energydensity_r(r,E).*r; % r in mm
-
-% fun=@(r)rudd_density(r.*1e-3,E).*r; % r in mm
+% fun=@(r)energydensity_r(r,E).*r; % r in mm
+warning('off','all');
+fun=@(r)rudd_density(r.*1e-3,E).*r; % r in mm
 r_integral=integral(fun,0,1)*2*pi; % J kg^-1 mm^2
 r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
+warning('on','all');
 
 % % we choose to not follow toulemonde's model, and let the radial dose
 % determine dose directly, only normalising time portion
@@ -156,10 +157,13 @@ rem_E_MeV=0.04;
 %}
 
 % pdepe temp spike model (use this instead)
+warning('off','all');
 lmbda=2; % nm
 g_const=2e-7/(lmbda^2); % e-phonon coupling
 % g_const=g_const/25;
-pdefun=@(x,t,u,dudx)pdefun_plchold(x,t,u,dudx,rho,g_const,rem_E_MeV,bconst,S_e);
+% pdefun=@(x,t,u,dudx)pdefun_plchold(x,t,u,dudx,rho,g_const,rem_E_MeV,bconst,S_e);
+pdefun=@(x,t,u,dudx)pdefun_plcholdrudd(x,t,u,dudx,rho,g_const,rem_E_MeV,bconst,S_e);
+
 icfun=@(x) [310;310]; % initial conditions 310K both systems
 space_itv=0.1;
 xmesh=0:space_itv:25;
@@ -174,6 +178,7 @@ for i=0:0.5:5
 end
 xlabel('Time (s)'); ylabel('Temp. (K)'); 
 legend(legentries); grid on;
+warning('on','all');
 
 % % electronic system
 % figure;
@@ -367,7 +372,9 @@ legend(legentries); grid on;
 %         if lowerlimit<=capW % only run if range of energies required is less than max
 %             % perform integrals in keV units
 %             ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
-%             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
+%             wlist=lowerlimit:(capW-lowerlimit)/100000:capW;
+% %             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
+%             dosecontribs(i,j)=trapz(wlist,ruddintegral(wlist));
 %             dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
 %             dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
 %         end
