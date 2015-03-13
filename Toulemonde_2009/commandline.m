@@ -38,9 +38,9 @@ addpath(bortfolder);
 E=0.04; %MeV
 dens=1e-6; %kg mm^-3;
 
-% fun=@(r)energydensity_r(r,E).*r; % r in mm
-% r_integral=integral(fun,0,1)*2*pi; % J kg^-1 mm^2
-% r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
+fun=@(r)energydensity_r(r,E).*r; % r in mm
+r_integral=integral(fun,0,1)*2*pi; % J kg^-1 mm^2
+r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
 
 % % rudd version for b constants
 warning('off','all');
@@ -186,6 +186,7 @@ end
 xlabel('Time (s)'); ylabel('Temp. (K)'); 
 legend(legentries); grid on;
 warning('on','all');
+xlim([1e-15,1e-9]);
 
 % % electronic system
 % figure;

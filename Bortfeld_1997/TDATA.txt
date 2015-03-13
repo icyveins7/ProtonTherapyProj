@@ -1,0 +1,42 @@
+====== H (10) into Layer 1                      =======
+        SRIM-2013.00
+=======================================
+      Data  of  TRIM  Calculation      
+=======================================
+--------------------------------------------------------------------
+    Recoil/Damage Calculations made with Kinchin-Pease Estimates    
+--------------------------------------------------------------------
+Ion =  H ( 1)   Ion Mass= 001.0080
+Energy  = 1000000.E-01 keV
+Ion Angle to Surface = 0 degrees
+============= TARGET MATERIAL ======================================
+  Layer # 1 - Water_Liquid (ICRU-276)
+  Layer # 1 - Bottom Depth=     9.E+08 A
+  Layer # 1- Density = 10.02E22 atoms/cm3 = 1 g/cm3
+  Layer # 1-  H = 66.6 Atomic Percent = 11.1 Mass Percent
+  Layer # 1-  O = 33.3 Atomic Percent = 88.8 Mass Percent
+====================================================================
+Target energies for target atom =  H
+    Displacement = 10 eV, Binding = 3 eV, Surface = 2 eV
+Target energies for target atom =  O
+    Displacement = 28 eV, Binding = 3 eV, Surface = 2 eV
+====================================================================
+Depth Range of Tabulated Data=  000000.E+00  -  900000.E+03  Angstroms
+====================================================================
+Total Ions calculated =  004158
+Average Range         =   76146.E+04 Angstroms
+Average Straggling    =   10468.E+03 Angstroms
+Average Vacancy/Ion   =   30562.E-02
+====================================================================
+Total Backscattered Ions=  0 
+Total Transmitted Ions  =  0 
+====================================================================
+See files SRIM Outputs\*.txt for tables :
+   TDATA.txt    -- Details of the calculation.
+   RANGE.txt    -- Final distribution of Ions/Recoils
+   VACANCY.txt  -- Distribution of Vacancies
+   IONIZ.txt    -- Distribution of Ionization
+   PHONON.txt   -- Distribution of Phonons
+   E2RECOIL.txt -- Energy transferred to recoils
+   NOVAC.txt    -- Replacement collisions
+   LATERAL.txt  -- Lateral Spread of Ions

@@ -5,28 +5,28 @@
 
 close all; clear all; clc; clear mem;
 
-% % Declaring constants/parameters
-% E0=75; %E0 in units of MeV
-% alpha=2.2e-3;
-% p=1.77;
-% rho=1; %mass density of medium, g/cm^3
-% R0=range(alpha,E0,p); %R in units of cm
-% beta=0.012;
-% gamma=0.6; %fraction of energy released in the nonelastic nuclear 
-% %interactions that is absorbed locally
-% phi0=1000; %primary particle fluence
-% epsilon=0.1; %fraction of peak fluence in tail fluence
-% 
-% % testing functions
-% R=0:R0/500:R0*1.1; %cm
-% d=0:R0/500:R0*1.1; %cm
+% Declaring constants/parameters
+E0=100; %E0 in units of MeV
+alpha=2.2e-3;
+p=1.77;
+rho=1; %mass density of medium, g/cm^3
+R0=range(alpha,E0,p); %R in units of cm
+beta=0.012;
+gamma=0.6; %fraction of energy released in the nonelastic nuclear 
+%interactions that is absorbed locally
+phi0=1000; %primary particle fluence
+epsilon=0.1; %fraction of peak fluence in tail fluence
+
+% testing functions
+R=0:R0/500:R0*1.1; %cm
+d=0:R0/500:R0*1.1; %cm
 
 % R=0:0.1:R0;
 % d=0:0.1:R0;
 
-% flu=fluence(phi0,beta,R0,d);
-% D_z=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,0,0,1);
-% Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho,epsilon);
+flu=fluence(phi0,beta,R0,d);
+D_z=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,0,0,1);
+Dhat_z=dosehat(phi0,beta,alpha,gamma,E0,p,d,rho,epsilon);
 
 % % basic plots
 % figure(3);
@@ -61,9 +61,9 @@ close all; clear all; clc; clear mem;
 % % figleg=legend('Matlab function','C Library'); set(figleg,'Interpreter','Latex');
 
 % % % plotting effects of beam energy spread;
-% E_sigma=0.01*E0;
+E_sigma=0.01*E0;
 % D_realbeam=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,epsilon,E_sigma,1);
-% D_realbeam2=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,2*epsilon,2*E_sigma,1);
+D_realbeam2=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,2*epsilon,2*E_sigma,1);
 % figure(5);
 % plot(d,D_realbeam./flu,'o','MarkerSize',1);hold on;
 % plot(d,D_realbeam2./flu,'k-');
@@ -75,6 +75,7 @@ close all; clear all; clc; clear mem;
 
 
 % local heating
+%{
 % r1=3; %tube radius, in nm
 % r2=5;
 % r3=7;
@@ -93,8 +94,10 @@ close all; clear all; clc; clear mem;
 % xlabel('Depth (cm)'); 
 % legend(strcat('r = ',num2str(r1),'nm'), strcat('r =',num2str(r2),'nm'), strcat('r =',num2str(r3),'nm'), strcat('r =',num2str(r4),'nm'), 'Location','NorthWest');
 % figtitle=title(strcat(num2str(E0),' MeV proton'));
+%}
 
 % % Gaussian noise 
+%{
 % num=10000;
 % E0values=normrnd(E0, 0.01*E0, [1,num]);
 % D_noise=zeros(num,length(d));
@@ -110,8 +113,10 @@ close all; clear all; clc; clear mem;
 % plot(d,sum(D_noise)/num,'k'); hold on;
 % dcompare=dose_C(phi0,beta,alpha,gamma,E0,p,d,rho,0,0.01*E0,1);
 % plot(d,dcompare);
+%}
 
 % testing integrals for remaining beam energy
+%{
 Elist=10;
 LETvalues=zeros(2,length(Elist));
 
@@ -166,3 +171,17 @@ LETvalues(2,j)=E_rem(ind10);
 % E_rem(maxind)
 % d(maxind)
 end
+%}
+
+%extraction from SRIM
+fid=fopen('IONIZ_100MeV.txt','r');
+for i=1:7
+    fgetl(fid); % skip the text lines
+end
+data=fscanf(fid,'%f %f %f',[3, Inf]);
+srimdepth=data(1,:)*1e-7; %mm
+srimlet=data(2,:)*1e-6*1e7; %MeV/mm
+plot(srimdepth,srimlet); hold on; plot(d*10,D_z./flu*rho/10,'--'); xlabel('Depth (mm)'); ylabel('LET (MeV/mm)');
+plot(d*10,D_realbeam2./flu*rho/10,'.-');
+figtitle=title('100 MeV, $\epsilon$ =0.2, $\sigma_{E,0}$ =2');set(figtitle,'Interpreter','Latex');
+legend('SRIM','Bortfeld (monochromatic)','Bortfeld (initial energy beam spread)','Location','NorthWest');
