@@ -24,7 +24,7 @@ for i=1:5
         if lowerlimit<=capW % only run if range of energies required is less than max
             % perform integrals in keV units
             ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
-            wlist=lowerlimit:(capW-lowerlimit)/100000:capW;
+            wlist=lowerlimit:(capW-lowerlimit)/10000:capW;
             energydensitylist(i,j)=trapz(wlist,ruddintegral(wlist));
             energydensitylist(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*energydensitylist(i,j); % eV/kg
             energydensitylist(i,j)=energydensitylist(i,j)*1.602e-19; % J/kg

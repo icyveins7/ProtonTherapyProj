@@ -9,7 +9,7 @@ currfolder=currfolder(1:end-15);
 bortfolder=strcat(currfolder,'Bortfeld_1997');
 addpath(bortfolder);
 
-% 
+%{
 % % Energy density tests
 % r=logspace(-7,0,250); % mm
 % [e1,e1_1]=energydensity_r(r,1);
@@ -25,7 +25,8 @@ addpath(bortfolder);
 % loglog(r*1e6,e100,'m'); loglog(r*1e6,e100_1,'m--');
 % legend('1 MeV','1 MeV(without correction)','10 MeV','10 MeV(without correction)','20 MeV','20 MeV(without correction)','50 MeV','50 MeV(without correction)','100 MeV','100MeV(without correction)');
 % ylim([1e-8, 1e7]); xlabel('Radius (nm)'); ylabel('Dose (Gy)');
-% 
+%}
+
 % % // all code between // used in fcoefffunction, just typed here for
 % % // checking purposes
 % % solving for normalisation constant
@@ -38,16 +39,22 @@ E=0.04; %MeV
 dens=1e-6; %kg mm^-3;
 
 % fun=@(r)energydensity_r(r,E).*r; % r in mm
+% r_integral=integral(fun,0,1)*2*pi; % J kg^-1 mm^2
+% r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
+
+% % rudd version for b constants
 warning('off','all');
-fun=@(r)rudd_density(r.*1e-3,E).*r; % r in mm
-r_integral=integral(fun,0,1)*2*pi; % J kg^-1 mm^2
-r_integral=r_integral*1e-3*1e12; % J g^-1 nm^2
+% rlist=1e-11:(maxradius-1e-11)/1000:maxradius; % m
+fun=@(r) rudd_density(r,E).*r;
+% r_integral=trapz(rlist,fun(rlist))*2*pi; % J kg^-1 m^2
+r_integral=integral(fun,0,1e-8)*2*pi; % J kg^-1 m^2
+r_integral=r_integral*1e-3*1e18; % J g^-1 nm^2
 warning('on','all');
 
 % % we choose to not follow toulemonde's model, and let the radial dose
 % determine dose directly, only normalising time portion
 t_integral=integral(@energydensity_t,0,1e-9); % integrate from - inf instead??
-bconst=1/(t_integral*r_integral);
+bconst=1/(t_integral*r_integral); disp(bconst);
 
 % % need to solve for value of E of proton at the bragg peak->solve for v ->
 % % insert into energydensity_r -> use LET derived from Bortfeld funcs
@@ -372,7 +379,7 @@ warning('on','all');
 %         if lowerlimit<=capW % only run if range of energies required is less than max
 %             % perform integrals in keV units
 %             ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
-%             wlist=lowerlimit:(capW-lowerlimit)/100000:capW;
+%             wlist=lowerlimit:(capW-lowerlimit)/10000:capW;
 % %             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
 %             dosecontribs(i,j)=trapz(wlist,ruddintegral(wlist));
 %             dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
@@ -385,11 +392,6 @@ warning('on','all');
 % dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
 % loglog(rlist,dosecontribs(6,:));    
 % legend('1','2','3','4','5','total');
-
-% dens=1e3; %kg m^-3;
-% % fun1=@(r)dosecontribs(r,9.9890).*r; % r in mm
-% r_integral=trapz(rlist,dosecontribs(6,:).*rlist)*dens*2*pi; % J m^-1
-% r_integral=r_integral/1.6e-19*1e-6*1e-2; % J m^-1->MeV cm^-1
 
 % % graphs appear to match rudd's original paper, not dingfelder's one (which
 % % are higher by a bit)
