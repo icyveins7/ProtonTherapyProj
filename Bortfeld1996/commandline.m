@@ -37,14 +37,14 @@ D0=max(D_BP_d);
 % plot(R,W_R);hold on;
 % plot([maxR, maxR], get(gca, 'ylim'),'--');
 % 
-W_disc_R=weight_disc(alpha,p,D0,rho,d_a,d_b,0.1); 
+W_disc_R=weight_disc(alpha,p,D0,rho,d_a,d_b,0.01); 
 figure(5);
 plot(W_disc_R(2,1:end),W_disc_R(1,1:end),'.-'); hold on; %goes negative??
 plot([maxR, maxR], get(gca, 'ylim'),'--');
-
+% 
 % making discrete intervals of dose distribs
 dim=size(W_disc_R);
-dim=dim(2);
+dim=dim(2); 
 depthdose_mat=zeros(dim,length(d));
 figure(6);
 for i=1:dim
