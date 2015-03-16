@@ -405,20 +405,20 @@ Stexc=probp*Stexc;% Excitation cross section should also be given a % probabilit
 TCS=StopCC+Stopcs+Stcshyd+Stexc;
 
 
-% if T>1e6
-%     % Bethe-bloch equation for T>1MeV
-%     rho=1; % mass density of medium (g/cm^3), declared above
-%     % z=1; % Projectile's charge, declared above
-%     % Z=10; % Number of electrons in the target material, declared above
-%     K=0.307075; % (MeV mol^-1 cm^2)
-%     Am=18.015; % atomic mass of absorber/water (g mol^-1)
-%     I_mean=78e-6; % mean excitation energy (MeV) 
-%     mass_e=0.510998928; % electron mass (MeV/c^2)
-%     mass_p=938.272046; % proton mass (MeV/c^2)
-%     T_max=2*mass_e*betav^2*gamma^2/( 1+2*gamma*mass_e/mass_p+(mass_e/mass_p)^2 ); % max KE imparted to a free electron (MeV)
-%     LET = 1e8*rho*K*z^2*Z*Am^-1*betav^-2*(0.5*log( 2*mass_e*betav^2*gamma^2*T_max*I_mean^-2 )-betav^2); % (eV/m)
-%     % final term is ignored?
-% else
+if T>1e6
+    % Bethe-bloch equation for T>1MeV
+    rho=1; % mass density of medium (g/cm^3), declared above
+    % z=1; % Projectile's charge, declared above
+    % Z=10; % Number of electrons in the target material, declared above
+    K=0.307075; % (MeV mol^-1 cm^2)
+    Am=18.015; % atomic mass of absorber/water (g mol^-1)
+    I_mean=78e-6; % mean excitation energy (MeV) 
+    mass_e=0.510998928; % electron mass (MeV/c^2)
+    mass_p=938.272046; % proton mass (MeV/c^2)
+    T_max=2*mass_e*betav^2*gamma^2/( 1+2*gamma*mass_e/mass_p+(mass_e/mass_p)^2 ); % max KE imparted to a free electron (MeV)
+    LET = 1e8*rho*K*z^2*Z*Am^-1*betav^-2*(0.5*log( 2*mass_e*betav^2*gamma^2*T_max*I_mean^-2 )-betav^2); % (eV/m)
+    % final term is ignored?
+else
     %Linear energy transfer (eV/m)
     LET=n*TCS;
-% end
+end
