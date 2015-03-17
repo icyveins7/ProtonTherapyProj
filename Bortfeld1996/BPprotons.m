@@ -181,9 +181,19 @@ if exist('epsilon','var')
     % plot
     plot(x,L_E_Tbf,'^','MarkerSize',2); hold on;
     if epsilon~=0
-        plot(x,L_E_Tbfmono,'k--');
-        plot(x,L_E_T_es,'o','MarkerSize',2);
+        plot(x,L_E_Tbfmono,'k--'); hold on;
+        plot(x,L_E_T_es,'o','MarkerSize',2); hold on;
     end
+%     %extraction from SRIM
+%     fid=fopen('IONIZ_100MeV.txt','r');
+%     for i=1:7
+%         fgetl(fid); % skip the text lines
+%     end
+%     data=fscanf(fid,'%f %f %f',[3, Inf]);
+%     srimdepth=data(1,:)*1e-7; %mm
+%     srimlet=data(2,:)*1e-6*1e7; %MeV/mm
+%     plot(srimdepth,srimlet);
+%     legentries{end+1}='SRIM data';
     legend(legentries,'Location','NorthWest');
     figtitle=title(strcat(num2str(Tn),' MeV, $\epsilon$ = ',num2str(epsilon),', $\sigma_{E,0}$ = ',num2str(E_sigma)));
     set(figtitle,'Interpreter','Latex');

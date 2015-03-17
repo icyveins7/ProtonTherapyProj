@@ -37,7 +37,7 @@ D0=max(D_BP_d);
 % plot(R,W_R);hold on;
 % plot([maxR, maxR], get(gca, 'ylim'),'--');
 % 
-W_disc_R=weight_disc(alpha,p,D0,rho,d_a,d_b,0.01); 
+W_disc_R=weight_disc(alpha,p,D0,rho,d_a,d_b,0.1); 
 figure(5);
 plot(W_disc_R(2,1:end),W_disc_R(1,1:end),'.-'); hold on; %goes negative??
 plot([maxR, maxR], get(gca, 'ylim'),'--');
@@ -55,7 +55,7 @@ end
 plot(d,sum(depthdose_mat,1),'k');
 ylab2=ylabel('$D_{SOBP}$ (Gy)');set(ylab2,'Interpreter','Latex');
 xlab=xlabel('Depth (cm)');
-
+title('Interval width = 0.1');
 
 % figure(7); % as a check for the raw dose distributions (unweighted)
 % for i=1:dim
