@@ -352,47 +352,47 @@ rho=1; %mass density of medium, g/cm^3
 % % legend('integrated values','analytical with summation alpha fix', 'analytical with reciprocal alpha fix');
 % legend('integrated values','analytical with summation alpha fix');
 
-% % tinkering with rudd
-E_ion=9.9890; %MeV
-lorentzfactor=(E_ion/938)+1;
-b=(1-(1/lorentzfactor)^2)^0.5; %beta
-capW=1e3*(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in eV
-k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alpha_w
-density=1e3; % kg m^-3
-
-Z=1;
-Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
-rlist=logspace(-10,-3,250);
-
-dosecontribs=zeros(6,250);
-figure;
-warning('off','all');
-for i=1:5
-    for j=1:length(rlist) % m
-        r=rlist(j);
-        lowerlimit=(r*density/k)^(1/1.079); %keV
-        if lowerlimit>1 %keV
-            lowerlimit=(r*density/k)^(1/1.667);
-        end
-        
-        lowerlimit=lowerlimit*1000; %eV
-        
-        if lowerlimit<=capW % only run if range of energies required is less than max
-            % perform integrals in keV units
-            ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
-            wlist=lowerlimit:(capW-lowerlimit)/10000:capW;
-%             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
-            dosecontribs(i,j)=trapz(wlist,ruddintegral(wlist));
-            dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
-            dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
-        end
-    end
-    loglog(rlist,dosecontribs(i,:)); hold on;
-end
-warning('on','all');
-dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
-loglog(rlist,dosecontribs(6,:));    
-legend('1','2','3','4','5','total');
+% % % tinkering with rudd
+% E_ion=9.9890; %MeV
+% lorentzfactor=(E_ion/938)+1;
+% b=(1-(1/lorentzfactor)^2)^0.5; %beta
+% capW=1e3*(2*9.10938291e-31*(299792458)^2*b^2*(1-b^2)^-1)/(1.60217657e-16); % kinematically limited max energy, in eV
+% k=6e-11*1e6; % g cm^-2 keV^-alpha_w -> kg mm^-2 keV^-alpha_w -> kg m^-2 keV^-alpha_w
+% density=1e3; % kg m^-3
+% 
+% Z=1;
+% Z_star=Z*(1-exp(-125*b*Z^(-2/3))); % effective charge of ion
+% rlist=logspace(-10,-3,250);
+% 
+% dosecontribs=zeros(6,250);
+% figure;
+% warning('off','all');
+% for i=1:5
+%     for j=1:length(rlist) % m
+%         r=rlist(j);
+%         lowerlimit=(r*density/k)^(1/1.079); %keV
+%         if lowerlimit>1 %keV
+%             lowerlimit=(r*density/k)^(1/1.667);
+%         end
+%         
+%         lowerlimit=lowerlimit*1000; %eV
+%         
+%         if lowerlimit<=capW % only run if range of energies required is less than max
+%             % perform integrals in keV units
+%             ruddintegral=@(W) ruddcs_integral(W,r,i,E_ion);
+%             wlist=lowerlimit:(capW-lowerlimit)/10000:capW;
+% %             dosecontribs(i,j)=integral(ruddintegral,lowerlimit,capW,'RelTol',0,'AbsTol',1e-15); % m eV/kg
+%             dosecontribs(i,j)=trapz(wlist,ruddintegral(wlist));
+%             dosecontribs(i,j)=Z_star.^2.*(1./(2.*pi.*r)).*dosecontribs(i,j); % eV/kg
+%             dosecontribs(i,j)=dosecontribs(i,j)*1.602e-19; % J/kg
+%         end
+%     end
+%     loglog(rlist,dosecontribs(i,:)); hold on;
+% end
+% warning('on','all');
+% dosecontribs(6,:)=sum(dosecontribs(1:5,:),1);
+% loglog(rlist,dosecontribs(6,:));    
+% legend('1','2','3','4','5','total');
 
 % % graphs appear to match rudd's original paper, not dingfelder's one (which
 % % are higher by a bit)
@@ -501,17 +501,17 @@ legend('1','2','3','4','5','total');
 % 
 
 % % show all on same graph
-[olddosewithcorr,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);
-% % [nil,olddose_fromfunc10]=energydensity_r(rlist.*1e3,E_ion,0.010); %using 10eV as I, as in waligorski
-figure;
-loglog(rlist.*1e3,dosecontribs(6,:)); % convert to mm
-hold on;
-% % loglog(rlist.*1e3,olddose_rawwithI_list);
-% % loglog(rlist.*1e3,olddose_num_list);
-loglog(rlist.*1e3,olddose_fromfunc); loglog(rlist.*1e3,olddosewithcorr);
-% % loglog(rlist.*1e3,olddose_fromfunc10);
-% loglog(r.*1e3,totals);
-% % legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
+% [olddosewithcorr,olddose_fromfunc]=energydensity_r(rlist.*1e3,E_ion);
+% % % [nil,olddose_fromfunc10]=energydensity_r(rlist.*1e3,E_ion,0.010); %using 10eV as I, as in waligorski
+% figure;
+% loglog(rlist.*1e3,dosecontribs(6,:)); % convert to mm
+% hold on;
+% % % loglog(rlist.*1e3,olddose_rawwithI_list);
+% % % loglog(rlist.*1e3,olddose_num_list);
+% loglog(rlist.*1e3,olddose_fromfunc); loglog(rlist.*1e3,olddosewithcorr);
+% % % loglog(rlist.*1e3,olddose_fromfunc10);
+% % loglog(r.*1e3,totals);
+% % % legend('Rudd','Rutherford/Wali (running alpha)','Rutherford/Wali (numerical)','Rutherford/Wali (static alpha)','Rutherford/Wali (static alpha, I=10eV)');
 
 % % electron range
 %{
