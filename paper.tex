@@ -1,0 +1,246 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University/School Laboratory Report
+% LaTeX Template
+% Version 3.0 (4/2/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Linux and Unix Users Group at Virginia Tech Wiki 
+% (https://vtluug.org/wiki/Example_LaTeX_chem_lab_report)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{article}
+
+\usepackage{siunitx} % Provides the \SI{}{} command for typesetting SI units
+
+\usepackage{graphicx} % Required for the inclusion of images
+
+\usepackage{caption}
+
+\usepackage{multicol}
+
+%\usepackage{subcaption}
+
+\usepackage{float}
+
+\usepackage{subfig}
+
+\usepackage[english]{babel}
+
+\usepackage{amsmath}
+
+\usepackage{mathrsfs}
+
+\usepackage{gensymb}
+
+\usepackage[margin=1.1in]{geometry}
+
+%\usepackage{mathtools}
+
+\usepackage{wrapfig}
+
+\setlength{\parindent}{0.8cm}
+
+\renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
+
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+\begin {center}
+\huge \textbf{Temperature spikes due to proton beams in liquid water}\\
+\vspace{10pt}
+\empty
+\large {Gabriel Lim, Ping Lin Yeap, Morteza Aslaninejad}\\
+\small
+\vspace{10pt}
+\begin{tabular}{l r}
+\centerline{23 March 2015. Blackett Laboratory, Imperial College London.}\\
+
+\end{tabular}
+\end{center}
+
+\begin{abstract}
+A sufficient increase in temperature of biological medium due to ion beams traversing can be considered as an independent mechanism of cell damage. In this paper, temperature spikes in liquid water due to proton beams are simulated using the inelastic thermal spike model. Results show that there is a large increase in temperature around the ion track near the Bragg peak within the time period of $10^{-15}$ to $10^{-9}$ s after the proton's passage. An alternative semi-empirical form of the singly differentiated cross section proposed by Rudd was then used in the thermal spike model, and results show that there is a larger temperature increase near the ion track.
+\end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\begin{multicols}{2}
+\section{Introduction}
+
+\indent Radiotherapy is one of the most important therapies in the treatment of cancers. Conventional radiotherapy uses X-rays or photons due to their relatively low costs and ease of production, but the use of charged ions has been gaining popularity due to its depth-dose distribution. While photons deposit most of their energies near the entrance of the medium, charged ions do so at a very precise depth (also known as the Bragg peak \cite{proton}), while depositing very little energy at the entrance. This reduces the harmful effects on neighbouring healthy tissues. \\
+\indent A significant temperature increase in the medium can also cause damage to DNA. The typical temperature at which DNA melts is about 85$\degree$C \cite{localheating}. Large temperature changes can be caused by inelastic collisions between the ions and the water molecules, resulting in their ionisation and the subsequent production of secondary electrons. These secondary electrons then carry energy through the medium, leading to a rise in temperature.\\
+\indent In this paper, the temperature changes in liquid water caused by proton beams were simulated using the inelastic thermal spike model proposed by Toulemonde et al.\cite{thermalspike}, as described in Section 2. This model makes use of the radial dose distribution given by Katz et al.\cite{katz} with an added correction by Waligorski et al.\cite{waligorski}. The radial dose distribution also employs Rutherford's cross sections for the production of secondary electrons. The temperature spikes as well as the radial dose distribution generated using this model were plotted and discussed. \\
+\indent We then attempt to make improvements to the thermal spike model by using Rudd's cross sections instead of Rutherford's. Rudd and co-workers \cite{rudd} derived a semi-empirical expression for the singly differentiated cross section (SDCS) by fitting experimental data to Rutherford's cross sections. This will be elaborated in Section 3. By using Rudd's formula and solving for the radial dose distribution numerically, it was discovered that Rudd's radial dose distribution is higher than Rutherford's for all radius. The temperature spikes calculated using Rudd's radial dose distribution are also higher. 
+\indent In Section 4, we examine the results obtained using both cross sections, and provide some of the limitations present in this study. Finally, we conclude this paper.
+ 
+%---------------------------------------------------------------------------------------
+%    THERMAL SPIKE MODEL
+%---------------------------------------------------------------------------------------
+
+\section {Thermal spike model}
+
+The ionisation of water by the proton beams results in a production of secondary electrons, which can then carry energy through the medium, leading to a rise in temperature. This can be modelled by the inelastic thermal spike model, which comprises two coupled partial differential equations of energy transfer, one into the electronic subsystem and the other into the molecular subsystem\cite{thermalspike}:
+\begin{equation}\rho_{e}C_{e}(T_{e})\frac{\partial T_{e}}{\partial t}=\nabla (K_{e}\nabla T_{e})-g(T_{e}-T)+A(r,t),
+\end{equation}
+\begin{equation}\rho C(T) \frac{\partial T}{\partial t}=\nabla[K(T)\nabla T]+g(T_{e}-T),
+\end{equation}
+where $T_{e}, T, C_{e}, C, K_{e}, K, \rho_{e}, \rho$ are the temperatures, specific heats, thermal conductivities and mass density of the electronic and molecular subsystems respectively. The energy exchange term between the two subsystems is given by the $g(T_{e}-T)$ term, where $g$ is the electron-phonon coupling constant, which is related to the electron-phonon mean free path $\lambda$ through $\lambda^{2}=K_{e}/g$. Due to the insulator characteristics of water, the two subsystems decouple when the molecular temperature is higher than the electronic temperature \cite{toulemonde25}. $A(r,t)$ is the energy deposition of the proton into the electronic subsystem\cite{energydensity}, and consists of a Gaussian time distribution and a radial distribution $F(r)$ of the secondary electrons:
+\begin{equation}A(r,t)=bS_{e}e^{-(t-t_{0})^{2}/2s^{2}}F(r),
+\end{equation}
+where $s$ is the half-width of the Gaussian distribution of the time for the electrons to reach thermal equilibrium (estimated to be $10^{-14}$ s), $S_{e}$ is the total electronic energy loss, and $b$ is a normalization factor. \\
+\indent The radial distribution $F(r)$ of the secondary electrons is given by Katz et al.\cite{katz} to be:
+\begin{equation}F(r)=\frac{1}{2\pi r\rho dr dz}\int_{w_{r}}^{W} (-\frac{dw_{r}}{dr}) dr dz \frac{dn}{dw} dw,
+\end{equation}
+where $r$ is the radial distance from the ion track, $\rho$ is the mass density of the medium, $w_{r}$ is the energy of an electron that has traversed a distance of $r$, $W$ is the kinematically limited maximum secondary-electron energy, and $dn/dw$ is the Rutherford's cross section for secondary-electron production:
+\begin{equation} \frac{dn}{dw}=\frac{2\pi Ne^{4}Z^{*2}}{mc^{2}\beta^{2}}\left(\frac{1}{(w+I)^{2}}\right),
+\end{equation}
+where $dn/dw$ is the number of secondary electrons per unit length with energy between $w$ and $w+dw$, $N$ is the electron density, $I$ is the ionisation potential (taken to be 78 eV here), and $Z^{*}$ is the effective charge. The integration, as shown in Waligorski's paper, then gives us the radial dose distribution as:
+\begin{equation} F(r)=\frac{Ne^{4}Z^{*2}}{\alpha mc^{2}\beta^{2}r}\left[\frac{(1-\frac{r+\theta}{T+\theta})^{1/\alpha}}{r+\theta}\right],
+\end{equation}
+where $\alpha$ is a constant that depends on the electron energy and velocity of the ion, $\theta$ is the range of an electron of energy $w=I$, and $T$ is the maximum range of the secondary electrons. \\
+\indent Waligorski and co-workers then added an additional correction term \cite{waligorski} in order to match the results from Monte Carlo calculations. The resulting radial dose distribution is plotted in Figure 1, with and without Waligorski's correction. 
+%
+\begin{center}
+\includegraphics[width=1\linewidth]{waligorskiradialdoses2}
+\captionsetup[figure]{format=hang,font=small}
+\captionof{figure}{Plot of dose against radius for protons of different energies, with (solid) and without (dashed) Waligorski's correction.}
+\label{fig1}
+\end{center}
+ %
+\indent Waligorski's corrected radial dose distribution also appears to agree well with experimental data in tissue-equivalent gas provided by Wingate and Baum \cite{wingate}.  \\
+\indent The coupled PDEs were then solved using the \textit{pdepe} Matlab toolkit, giving the temperature plot near the Bragg peak in Figure 2. 
+%
+\begin{center}
+\includegraphics[width=1\linewidth]{temps_I_78}
+\captionsetup[figure]{format=hang,font=small}
+\captionof{figure}{Plot of temperature against time for different radial distances from the track of a 0.04 MeV proton.}
+\label{fig2}
+\end{center}
+ %
+ 
+%---------------------------------------------------------------------------------------
+%    RUDD's SDCS
+%---------------------------------------------------------------------------------------
+
+\section {Rudd's SDCS}
+ 
+\indent It was noted by Dingfelder et al. \cite{dingfelder} that Rutherford's formula underestimates the actual SDCS for secondary electrons. 
+The semi-empirical expression given by Rudd et al. (termed Rudd's cross sections here for brevity), which was derived by fitting experimental data to Rutherford's cross sections, provides a better estimation for the cross section values. We used the expression for Rudd's cross sections given by Candela Juan et al. \cite{candela} and plotted the ratios of Rudd's cross sections to Rutherford's in Figure 3. It can be seen that Rudd's cross sections can be up to a few hundred times higher in the range of electron energies we are interested in. 
+%
+\begin{center}
+\includegraphics[width=1\linewidth]{crosssectionratios}
+\captionsetup[figure]{format=hang,font=small}
+\captionof{figure}{Ratios of Rudd's cross sections to Rutherford's cross sections for protons of different energies.}
+\label{fig3}
+\end{center}
+ %
+\begin{center}
+\includegraphics[width=1\linewidth]{10MeVruddradialdoses}
+\captionsetup[figure]{format=hang,font=small}
+\captionof{figure}{Rudd's total dose distribution (solid) and contributions from the 5 subshells (dashed) for 10MeV protons.}
+\label{fig4}
+\end{center}
+ %
+\indent The new radial dose distribution (termed Rudd's radial dose here for brevity) was then calculated numerically using Rudd's cross sections on Matlab and plotted in Figure 4 along with the contributions from the different subshells. The total radial dose distribution was then plotted along with the previous distribution obtained from Rutherford's cross sections in Figure 5. It can be seen that Rudd's radial dose is higher than Rutherford's for all radii, with the difference being most pronounced at smaller radii. In addition, Rudd's radial dose automatically accounts for the additional correction term that Waligorski introduced, and can possibly provide a physical explanation behind the correction term. Finally, the temperature change using Rudd's radial dose was plotted in Figure 6. 
+%
+\begin{center}
+\includegraphics[width=1\linewidth]{doses_ruddrutherford}
+\captionsetup[figure]{format=hang,font=small}
+\captionof{figure}{Rudd's (solid) and Rutherford's (dashed) radial dose distribution for 10MeV protons.}
+\label{fig5}
+\end{center}
+ %
+\begin{center}
+\includegraphics[width=1\linewidth]{temps_I_78_rudd}
+\captionsetup[figure]{format=hang,font=small}
+\captionof{figure}{Plot of temperature against time for different radial distances from the track of a 0.04 MeV proton using Rudd's SDCS.}
+\label{fig6}
+\end{center}
+ %
+
+%---------------------------------------------------------------------------------------
+%     RESULTS AND DISCUSSION
+%---------------------------------------------------------------------------------------
+
+\section {Results and Discussion}
+
+ %
+\begin{center}
+\includegraphics[width=1\linewidth]{tempcompare}
+\captionsetup[figure]{format=hang,font=small}
+\captionof{figure}{Plot of temperature against time for different radial distances from the track of a 0.04 MeV proton using Rutherford's (dashed) and Rudd's (solid) SDCS.}
+\label{fig7}
+\end{center}
+ %
+The temperature spikes in water calculated using Rutherford's cross sections (Figure 2) and Rudd's cross sections (Figure 6) are then plotted on the same graph in Figure 7. The maximum temperature reached along the ion track is at about 520 K using Rudd's SDCS, and about 440 K using Rutherford's SDCS. Both temperatures are sufficient in causing DNA damage, but a difference of 80 K is very large as well. In addition, the temperature differences between the two models are only significant near the ion track, as there appears to be no appreciable difference in temperature between the two models beyond 2 nm from the proton track. One similarity between the two models is that both temperatures peak after about $3\times10^{-14}$ s.
+
+
+%----------------------------------------------------------------------------------------
+%	CONCLUSION
+%----------------------------------------------------------------------------------------
+
+\section {Conclusion}
+The temperature increase in liquid water was discovered to be higher if Rudd's cross sections were used instead of Rutherford's. This has significant implications on the effectiveness of proton beams in cancer therapy. However, one major assumption used in this paper is that secondary electrons are ejected normally from the proton track. This assumption overestimates the radial dose distribution, hence more work has to be done in this area. Also, having experimental data for the dose distribution of protons in liquid water will prove beneficial. 
+
+%----------------------------------------------------------------------------------------
+%	APPENDIX
+%----------------------------------------------------------------------------------------
+
+\section {Appendix}
+
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\begin{thebibliography}{9} 
+\small
+
+\bibitem{proton} M W McDonald, M M Fitzek, \textit{Proton Therapy}, Curr Probl Cancer, Vol 34, Issue 4 (2010) 257-296.
+
+\bibitem{localheating} O I Obolensky, E Surdutovich, I Pshenichnov, I Mishustin, A V Solov'yov, W Greiner, \textit{Ion beam cancer therapy: Fundamental aspects of the problem}, Nuclear Instruments and Methods in Physics Research B 266 (2008) 1623 - 1628.  
+
+\bibitem{thermalspike} M Toulemonde, E Surdutovich, A V Solov'yov, \textit{Temperature and pressure spikes in ion-beam cancer therapy}, Physical Review E 80, 031913 (2009). 
+
+\bibitem{katz} C Zhang, D E Dunn, R Katz, \textit{Radial Distribution of Dose and Cross-Sections for the Inactivation of Dry Enzymes and Viruses}, Radiation Protection Dosimetry 13:1-4 (1985), 215-218.
+
+\bibitem{waligorski} M P R Waligorski, R N Hamm, R Katz, \textit{The Radial Distribution of Dose around the Path of a Heavy Ion in Liquid Water}, Robert Katz Publications, Paper 100 (1986). 
+
+\bibitem{rudd} M E Rudd, Y K Kim, D H Madison, T J Gray, \textit{Electron production in proton collisions with atoms and molecules: energy distributions}, Rev. Mod. Phys. 64 (1992), 441 - 490.
+
+\bibitem{toulemonde25} M Toulemonde, Ch Dufour, A Meftah, E Paumier, \textit{Transient thermal processes in heavy ion irradiation of crystalline inorganic insulators}, Nuclear Instruments and Methods in Physics Research B 166-167 (2000), 903-912.
+
+\bibitem{energydensity} M Toulemonde, W Assmann, C Dufour, A Meftah, F Studer, C Trautmann, \textit{Experimental Phenomena and Thermal Spike Model Description of Ion Tracks in Amorphisable Inorganic Insulators}, Ion Beam Science: Solved and Unsolved Problems, Copenhagen (2006). 
+
+\bibitem{wingate} C L Wingate, J W Baum, \textit{Measured Radial Distributions of Dose and LET for Alpha and Proton Beams in Hydrogen and Tissue-Equivalent Gas}, Radiation Research 65 (1976), 1-19.
+
+\bibitem{dingfelder} Michael Dingfelder, Mitio Inokuti, Herwig G Paretzke, \textit{Inelastic-collision cross sections of liquid water for interactions of energetic protons}, Radiation Physics and Chemistry 59 (2000) 255-275. 
+
+\bibitem{candela} C Candela Juan, M Crispin-Ortuzar, M Aslaninejad, \textit{Depth-dose distribution of proton beams using inelastic-collision cross sections of liquid water}, Nuclear Instruments and Methods in Physics Research B, 269 (2011) 189 - 196.
+
+
+
+
+\end{thebibliography}
+
+%----------------------------------------------------------------------------------------
+
+
+\end{multicols}
+\end{document}
