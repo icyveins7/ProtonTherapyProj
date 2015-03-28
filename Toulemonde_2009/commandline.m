@@ -426,50 +426,51 @@ rho=1; %mass density of medium, g/cm^3
 
 
 % testing angular dist integrals
-% close all;
-% currfolder=pwd;
-% currfolder=currfolder(1:end-15);
-% bortfolder=strcat(currfolder,'Bortfeld_1997');
-% addpath(bortfolder);
+close all;
+currfolder=pwd;
+currfolder=currfolder(1:end-15);
+bortfolder=strcat(currfolder,'Bortfeld_1997');
+addpath(bortfolder);
+
+E0=13.5; %MeV
+% E0=2;
+% r=1e-10; %m
+r= logspace(-10,-7,250);
+z2=0.217705998615886*1e-2; %m
+% traj_start=0.217e-2; %m
+% traj_end=0.2274e-2; %m
+
+% % test boundaries 1
+% traj_start=z2-250e-9; %m
+% traj_end=z2+250e-9; %m
+
+% moving boundaries closer to centre does not affect total dose much
+% used 5000 points for test boundaries 1 and 2, difference from trapz was
+% in the fifth significant figure.
+
+% % test boundaries 2
+% traj_start=z2-1e-8; %m
+% traj_end=z2+1e-8; %m
+
+%  test boundaries 3
+traj_start=z2-2e-9; %m
+traj_end=z2+2e-9; %m
 % 
-% E0=13.5; %MeV
-% % E0=2;
-% % r=1e-10; %m
-% r= logspace(-10,-7,250);
-% z2=0.217705998615886*1e-2; %m
-% % traj_start=0.217e-2; %m
-% % traj_end=0.2274e-2; %m
-% 
-% % % test boundaries 1
-% % traj_start=z2-250e-9; %m
-% % traj_end=z2+250e-9; %m
-% 
-% % moving boundaries closer to centre does not affect total dose much
-% % used 5000 points for test boundaries 1 and 2, difference from trapz was
-% % in the fifth significant figure.
-% 
-% % % test boundaries 2
-% % traj_start=z2-1e-8; %m
-% % traj_end=z2+1e-8; %m
-% 
-% %  test boundaries 3
-% traj_start=z2-2e-9; %m
-% traj_end=z2+2e-9; %m
-% % 
-% totals=zeros(1,length(r));
-% for i=1:length(r)
-% z1=traj_start:(traj_end-traj_start)/10000:traj_end;
-% newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
-% 
-% 
-% testvalues=newdoseintegral(z1);
-% totals(i)=trapz(z1,testvalues);
-% % figure; plot(z1,testvalues); 
-% 
-% 
-%     totals(i)=integral(newdoseintegral,traj_start,traj_end);
-% end
-% % loglog(r,totals);
+totals=zeros(1,length(r));
+for i=1:length(r)
+z1=traj_start:(traj_end-traj_start)/5000:traj_end;
+newdoseintegral=@(z1) newdose(z1, r(i), z2, E0);
+
+
+testvalues=newdoseintegral(z1);
+totals(i)=trapz(z1,testvalues);
+% figure; plot(z1,testvalues); 
+
+
+    totals(i)=integral(newdoseintegral,traj_start,traj_end);
+end
+loglog(r,totals);
+
 % 
 % % %//testing speed
 % % % z1=0:0.2274e-2/1000:0.2274e-2;
